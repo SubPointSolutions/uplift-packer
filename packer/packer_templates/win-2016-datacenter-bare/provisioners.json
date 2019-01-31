@@ -1,0 +1,14 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [win-2016-datacenter-bare] provisioners'"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [win-2016-datacenter-bare] provisioners'"
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-cleanup] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-cleanup] provisioners'"
+        }
+
+    ]
+}

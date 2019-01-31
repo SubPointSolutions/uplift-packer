@@ -1,0 +1,121 @@
+{
+    "provisioners": [
+
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-sharepoint2016-binm] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_RESOURCE_NAME={{user `uplf_sp_resource_name`}}",
+                "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+                "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-sp-update-dist-helper.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_SP_BIN_RESOURCE_NAME={{user `uplf_sp_resource_name`}}",
+                "UPLF_SP_UPDATE_RESOURCE_NAMES={{user `uplf_sp_update_resource_names`}}",
+                "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+                "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest"
+            ]
+        },
+        {
+            "type": "windows-restart"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest",
+                "UPLF_DSC_CHECK=1"
+            ]
+        },
+        
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_bin.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest",
+                "UPLF_SP_PRODUCT_KEY={{user `uplf_sp_product_key`}}"
+            ]
+        },
+        {
+            "type": "windows-restart"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_bin.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest",
+                "UPLF_SP_PRODUCT_KEY={{user `uplf_sp_product_key`}}",
+                "UPLF_DSC_CHECK=1"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_lang_pack.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_SP_LANG_PACK_RESOURCE_NAMES={{user `uplf_sp_lang_pack_resource_names`}}",
+                "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+                "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_resources/{{user `uplf_sp_resource_name`}}}/*' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+
+        {
+            "type": "windows-restart"
+        },
+        
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-sharepoint2016-binm] provisioners'"
+        }
+
+    ]
+}

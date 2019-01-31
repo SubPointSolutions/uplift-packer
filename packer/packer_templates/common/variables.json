@@ -1,0 +1,21 @@
+{
+    "variables": {
+        "uplf_http_directory": "",
+        "uplf_scripts_path": "./../",
+
+        "uplf_output_directory": "packer_builds/win2016-mb-soe",
+        "uplf_vagrant_box_output": "packer_boxes/win2016-mb-soe-bare/win2016-mb-soe.box",
+
+        "uplf_local_repository_path": "c:/_uplift_resources",
+
+        "uplf_vboxmanage_cpuexecutioncap": "80",
+        "uplf_vboxmanage_cpus": "4",
+        "uplf_vboxmanage_memory": "2048",
+
+        "uplf_git_branch": "",
+        "uplf_git_commit": "",
+
+        "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
+        "uplf_box_spec_dest_folder": "box-spec"
+    }
+}

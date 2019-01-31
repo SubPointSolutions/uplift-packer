@@ -1,0 +1,188 @@
+{
+  "variables": {
+    "uplf_http_directory": "",
+    "uplf_scripts_path": "./../",
+    "uplf_local_repository_path": "c:/_uplift_resources",
+    "uplf_vboxmanage_cpuexecutioncap": "80",
+    "uplf_git_branch": "",
+    "uplf_git_commit": "",
+    "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
+    "uplf_box_spec_dest_folder": "box-spec",
+    "uplf_iso_url": "https://download.microsoft.com/download/1/6/F/16FA20E6-4662-482A-920B-1A45CF5AAE3C/14393.0.160715-1616.RS1_RELEASE_SERVER_EVAL_X64FRE_EN-US.ISO",
+    "uplf_iso_checksum": "18a4f00a675b0338f3c7c93c4f131beb",
+    "uplf_iso_checksum_type": "md5",
+    "uplf_disk_size": "61440",
+    "uplf_vboxmanage_memory": "4096",
+    "uplf_vboxmanage_cpus": "4",
+    "uplf_output_directory": "packer_builds/win-2016-datacenter-bare",
+    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-bare/win-2016-datacenter-bare.box"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "iso_url": "{{user `uplf_iso_url`}}",
+      "iso_checksum": "{{user `uplf_iso_checksum`}}",
+      "iso_checksum_type": "{{user `uplf_iso_checksum_type`}}",
+      "vm_name": "uplift-{{ build_type }}-{{ timestamp }}",
+      "output_directory": "{{user `uplf_output_directory`}}",
+      "http_directory": "{{user `uplf_http_directory`}}",
+      "headless": true,
+      "disk_size": "{{user `uplf_disk_size`}}",
+      "guest_additions_mode": "attach",
+      "guest_os_type": "Windows2016_64",
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "12h",
+      "shutdown_command": "IF EXIST c:\\run-sysprep.cmd (CALL c:\\run-sysprep.cmd) ELSE (IF EXIST e:\\run-sysprep.cmd (CALL e:\\run-sysprep.cmd) ELSE (CALL f:\\run-sysprep.cmd)) &IF \"%ERRORLEVEL%\" == \"0\" (ECHO \"Shutdown script succeeded with exit code = %ERRORLEVEL%\" &EXIT 0) ELSE (ECHO \"Shutdown script failed with exit code = %ERRORLEVEL%\" &EXIT %ERRORLEVEL%)",
+      "shutdown_timeout": "15m",
+      "post_shutdown_delay": "2m",
+      "floppy_files": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/answer_files/autounattend.xml",
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.cmd",
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.ps1"
+      ],
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "{{user `uplf_vboxmanage_memory`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--vram",
+          "48"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "{{user `uplf_vboxmanage_cpus`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpuexecutioncap",
+          "{{user `uplf_vboxmanage_cpuexecutioncap`}}"
+        ]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [builders-win2016-iso] provisioners'"
+    },
+    {
+      "type": "file",
+      "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep.cmd",
+      "destination": "c:/run-sysprep.cmd"
+    },
+    {
+      "type": "file",
+      "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep.ps1",
+      "destination": "c:/run-sysprep.ps1"
+    },
+    {
+      "type": "file",
+      "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/answer_files/Autounattend_sysprep.xml",
+      "destination": "c:/Autounattend_sysprep.xml"
+    },
+    {
+      "type": "file",
+      "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
+      "destination": "c:/Windows/Temp/_uplift_winrm.ps1"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [builders-win2016-iso] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [provisioners-core-virtualbox-additions] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/install-virtualboxadditions.ps1"
+      ],
+      "only": [
+        "virtualbox-iso"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [provisioners-core-virtualbox-additions] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [provisioners-uplift-core] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/uplift-metadata.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_BOX_METADATA_GIT_BRANCH={{user `uplf_git_branch` }}",
+        "UPLF_BOX_METADATA_GIT_COMMIT={{user `uplf_git_commit` }}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [provisioners-uplift-core] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [provisioners-uplift-box-spec-extractor] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_box-spec-creator.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_BOX_SPEC_FILE={{user `uplf_box_spec_file` }}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `uplf_box_spec_file` }}",
+      "destination": "{{user `uplf_box_spec_dest_folder` }}/box-spec.json",
+      "direction": "download"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [provisioners-uplift-box-spec-extractor] provisioners'"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "{{user `uplf_vagrant_box_output`}}",
+      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template"
+    }
+  ]
+}

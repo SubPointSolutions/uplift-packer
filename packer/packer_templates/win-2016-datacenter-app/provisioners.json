@@ -1,0 +1,63 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [win-2016-datacenter-app] provisioners'"
+        },
+
+        
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-app/_install-netcore-feature.dsc.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-app/_install-netcore-feature.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_DSC_CHECK=1"
+            ]
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-app/_app_image.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_DSC_CHECK=1"
+            ]
+        },
+        {
+            "type": "powershell",
+            "inline": [
+                "Write-Host 'Installing Web Platform Installer...'",
+                "choco install -y webpicmd --limit-output --acceptlicense --no-progress"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+
+        {
+            "type": "windows-restart",
+            "restart_timeout": "5m"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [win-2016-datacenter-app] provisioners'"
+        }
+    ]
+}

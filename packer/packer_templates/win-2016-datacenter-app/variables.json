@@ -1,0 +1,10 @@
+{
+    "variables": {
+        "uplf_input_box_name": "uplift-local/win-2016-datacenter-soe",
+
+        "uplf_output_directory": "packer_builds/win-2016-datacenter-app",
+        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-app/win-2016-datacenter-app.box",
+
+        "uplf_invokeuplift_module_version": ""
+    }
+}

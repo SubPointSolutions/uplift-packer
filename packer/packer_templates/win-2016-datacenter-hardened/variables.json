@@ -1,0 +1,27 @@
+{
+    "variables": {
+        "uplf_http_directory": "",
+        "uplf_bin_repo_http_addr": "10.0.2.2:9091",
+        "uplf_scripts_path": "./../",
+
+        "uplf_iso_url": "https://download.microsoft.com/download/1/6/F/16FA20E6-4662-482A-920B-1A45CF5AAE3C/14393.0.160715-1616.RS1_RELEASE_SERVER_EVAL_X64FRE_EN-US.ISO",
+        "uplf_iso_checksum": "18a4f00a675b0338f3c7c93c4f131beb",
+        "uplf_iso_checksum_type": "md5",
+
+        "uplf_output_directory": "packer_builds/win2016-mb-soe-hardened",
+        "uplf_vagrant_box_output": "packer_boxes/win2016-mb-soe-hardened-bare/win2016-mb-soe-hardened.box",
+
+        "uplf_disk_size": "61440",
+
+        "uplf_vboxmanage_memory": "4096",
+        "uplf_vboxmanage_cpus": "4",
+
+        "uplf_ssu_resource_name": "ms-win2016-ssu-2018.05.17-kb4132216",
+        "uplf_ssu_name": "kb4132216",
+        "uplf_ssu_file_name": "windows10.0-kb4132216-x64_9cbeb1024166bdeceff90cd564714e1dcd01296e.msu",
+
+        "uplf_kb_resource_name": "ms-win2016-lcu-2019.01.17-KB4480977",
+        "uplf_kb_name": "KB4480977",
+        "uplf_kb_file_name": "windows10.0-kb4480977-x64_4630376d446938345665e2ce8379d96bb63a84c8.msu"
+    }
+}

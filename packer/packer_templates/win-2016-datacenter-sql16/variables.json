@@ -1,0 +1,19 @@
+{
+    "variables": {
+        "uplf_input_box_name": "uplift-local/win-2016-datacenter-app",
+
+        "uplf_output_directory": "packer_builds/win-2016-datacenter-sql16",
+        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-sql16/win-2016-datacenter-sql16.box",
+
+        "uplf_sql_resource_name": "ms-sql-server2016-rtm",
+
+        "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
+        "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82",
+
+        "uplf_bin_repo_http_addr": "10.0.2.2:9091",
+
+        "uplf_vboxmanage_cpuexecutioncap": "80",
+        "uplf_vboxmanage_cpus": "4",
+        "uplf_vboxmanage_memory": "4096"
+    }
+}

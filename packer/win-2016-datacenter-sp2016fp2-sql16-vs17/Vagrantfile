@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-2016-datacenter-sp2016rtm-sql16-vs17" 
+linked_clone   =  !ENV['UPLF_VAGRANT_LINKED_CLONE'].nil?
+
+vm_name_client = "sp16-dev"
+
+require_relative './../Vagrantfile.rb'
+
+uplift = VagrantPlugins::Uplift::Config()
+uplift.set_network_range("192.168.10")
+
+Vagrant.configure("2") do |config|
+  
+  config.vm.define "#{vm_name_client}" do | vm_config |   
+    
+    vm_config.vm.box = box_name
+    vm_config.vm.box_check_update = false
+
+    uplift.uplift_synced_folder(vm_name_client, vm_config)
+    uplift.uplift_4Gb(vm_name_client, vm_config)
+    uplift.uplift_hostname(vm_name_client, vm_config, vm_name_client)   
+
+    # client 
+    uplift.uplift_client_network(vm_name_client, vm_config, vm_name_client)
+    uplift.uplift_win16_dsc_base(vm_name_client, vm_config)
+    uplift.uplift_dc_join(vm_name_client, vm_config)
+
+    uplift.uplift_win16_dsc_shortcuts(vm_name_client, vm_config)
+
+    # complete sql image
+    uplift.uplift_sql(vm_name_client, vm_config)
+
+    # complete sharepoint install
+    if !uplift.has_checkpoint?(vm_name_spdev, 'sp-farm-presetup') 
+      uplift.uplift_sp16_pre_setup(vm_name_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-presetup'
+    end
+
+    if !uplift.has_checkpoint?(vm_name_spdev, 'sp_farm_only') 
+      uplift.uplift_sp16_farm_only(vm_name_client, vm_config, vm_name_client)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp_farm_only'
+    end
+
+    if !uplift.has_checkpoint?(vm_name_spdev, 'sp-farm-post-setup') 
+      uplift.uplift_sp16_farm_post_setup(vm_name_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-post-setup'
+    end
+
+    vm_config.vm.provision "shell", name: "hostname check", inline: "hostname"
+
+    vm_config.vm.provider "virtualbox" do |v|
+      v.linked_clone = linked_clone
+    end
+
+  end  
+
+end

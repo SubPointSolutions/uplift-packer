@@ -1,0 +1,59 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-vs17] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+              "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
+            ],
+            "environment_vars": [
+              "UPLF_RESOURCE_NAME={{user `uplf_vs17_resource_name`}}",
+              "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+              "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-visual-studio/vs17-prepare-script.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_DSC_CHECK=1",
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_vs17_resource_name`}}/latest",
+            
+                "UPLF_VS_EXECUTABLE_PATH={{user `uplf_local_repository_path` }}/{{user `uplf_vs17_resource_name`}}/latest/{{user `uplf_vs17_executable_name` }}",
+                "UPLF_VS_PACKAGE_IDS={{user `uplf_vs17_package_ids` }}",
+                "UPLF_VS_PACKAGE_COUNT={{user `uplf_vs17_package_count` }}"
+            ],
+            "valid_exit_codes": [0, 3010]
+        },
+
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
+        },
+
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+        {
+            "type": "windows-restart"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-vs17] provisioners'"
+        }
+    ]
+}

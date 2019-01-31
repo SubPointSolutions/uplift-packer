@@ -1,0 +1,78 @@
+{
+    "provisioners": [
+
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [win-2016-datacenter-soe] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_UPLIFT_CORE_MODULE_VERSION={{user `uplf_uplift_core_module_version`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/_install-features-win16.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_bootstrap.ps1"
+            ]
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_packages.ps1",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_setup-ps-nuget.ps1",
+
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift_resource_module.ps1",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_install-dsc-modules.ps1",
+
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_INVOKE_UPLIFT_MODULE_VERSION={{user `uplf_invokeuplift_module_version`}}",
+                "UPLF_INVOKE_UPLIFT_MODULE_REPOSITORY={{user `uplf_invokeuplift_module_repository`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [win-2016-datacenter-soe] provisioners'"
+        }
+
+    ]
+}

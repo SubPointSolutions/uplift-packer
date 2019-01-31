@@ -1,0 +1,41 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-core] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift.ps1"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/uplift-metadata.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_BOX_METADATA_GIT_BRANCH={{user `uplf_git_branch` }}",
+                "UPLF_BOX_METADATA_GIT_COMMIT={{user `uplf_git_commit` }}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+            ]
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-core] provisioners'"
+        }
+
+
+    ]
+}

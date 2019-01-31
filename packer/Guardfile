@@ -1,0 +1,46 @@
+# More info at https://github.com/guard/guard#readme
+
+guard :yield do
+
+    # root ps script changes -> generate corresponding template
+    watch(%r{^(.+)\.ps1$}) { |m|
+       
+        file_name = m[0]
+        puts "Changed file: #{file_name}"
+
+        target_cmd = [
+            #"clear",
+            "echo $(pwd)",
+            "pwsh -File #{file_name}"
+        ].join(" && ")
+
+        puts "Running: #{target_cmd}"
+        system(target_cmd)
+    }
+
+    # any packer template json change -> generate all templates
+    # watch(%r{^packer_templates/(.+)\.json$}) { |m|
+       
+    #     file_name = m[0]
+    #     #system("clear")
+    #     puts "Changed file: #{file_name}"
+    
+    #     Dir["*.ps1"].each do | file |
+
+    #         Thread.new("th-#{file}") do |i|
+    #             puts "Re-generating template: #{file}"
+
+    #             target_cmd = [
+    #                 "echo $(pwd)",
+    #                 "pwsh #{file} -Silent"
+    #             ].join(" && ")
+
+    #             puts "Running: #{target_cmd}"
+    #             system(target_cmd)
+    #         end
+    #     end
+        
+        
+    # }
+
+end 

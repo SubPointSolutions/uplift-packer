@@ -1,0 +1,142 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [win-2016-datacenter-hardened] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+            ]
+        },
+
+        {
+            "type": "file",
+            "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/tests/check-installed-kb.Test.ps1",
+            "destination": "c:/Windows/Temp/check-installed-kb.Test.ps1"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_RESOURCE_NAME={{user `uplf_ssu_resource_name` }}",
+                "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+                "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_RESOURCE_NAME={{user `uplf_kb_resource_name` }}",
+                "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+                "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/install-package.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_APP_PACKAGE_NAME={{user `uplf_ssu_name` }}",
+                "UPLF_APP_PACKAGE_FILE_PATH={{user `uplf_local_repository_path` }}/{{user `uplf_ssu_resource_name` }}/latest/{{user `uplf_ssu_file_name` }}",
+                "UPLF_APP_PACKAGE_SILENT_ARGS=/quiet /norestart /log:c:/windows/TEMP/{{user `uplf_ssu_resource_name` }}.install.evt",
+                "UPLF_APP_PACKAGE_EXIT_CODES=0"
+            ],
+            "valid_exit_codes": [0],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "$result = Invoke-Pester -PassThru -Script \"c:/Windows/Temp/check-installed-kb.Test.ps1\" ",
+                "Write-Host \"Pester exit code: $($result.FailedCount)\" ",
+                "exit $result.FailedCount"
+            ],
+            "environment_vars": [
+                "UPLF_TEST_KB_NAMES={{user `uplf_ssu_name` }}"
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/install-package.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_APP_PACKAGE_NAME={{user `uplf_kb_name` }}",
+                "UPLF_APP_PACKAGE_FILE_PATH={{user `uplf_local_repository_path` }}/{{user `uplf_kb_resource_name` }}/latest/{{user `uplf_kb_file_name` }}",
+                "UPLF_APP_PACKAGE_SILENT_ARGS=/quiet /norestart /log:c:/windows/TEMP/{{user `uplf_kb_resource_name` }}.Install.evt",
+                "UPLF_APP_PACKAGE_EXIT_CODES=0,3010"
+            ],
+            "valid_exit_codes": [0, 3010],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+
+        {
+            "type": "windows-restart",
+            "restart_timeout": "30m"
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+        
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "$result = Invoke-Pester -PassThru -Script \"c:/Windows/Temp/check-installed-kb.Test.ps1\" ",
+                "Write-Host \"Pester exit code: $($result.FailedCount)\" ",
+                "exit $result.FailedCount"
+            ],
+            "environment_vars": [
+                "UPLF_TEST_KB_NAMES={{user `uplf_kb_name` }}"
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
+            ]
+        },
+
+        {
+            "type": "windows-restart",
+            "restart_timeout": "90m"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [win-2016-datacenter-hardened] provisioners'"
+        }
+    ]
+}

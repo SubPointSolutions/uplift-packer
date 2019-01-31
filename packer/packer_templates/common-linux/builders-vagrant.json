@@ -1,0 +1,26 @@
+{
+    "builders": [{
+        "type": "vagrant",
+
+        "box_provider": "virtualbox",
+        "box_file": ".ovf",
+        "box_name": "{{user `uplf_input_box_name` }}",
+
+        "builder": {
+            "type": "virtualbox-ovf",
+
+            "output_directory": "{{user `uplf_output_directory`}}",
+            "http_directory": "{{user `uplf_http_directory`}}",
+
+            "headless": "true",
+            "boot_wait": "30s",
+
+            "ssh_username": "vagrant",
+            "ssh_password": "vagrant",
+            "ssh_wait_timeout": "8h",
+
+            "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+            "shutdown_timeout": "15m"
+        }
+    }]
+}

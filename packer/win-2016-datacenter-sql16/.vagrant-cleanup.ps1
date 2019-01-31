@@ -1,0 +1,1 @@
+vagrant destroy s16-single -f

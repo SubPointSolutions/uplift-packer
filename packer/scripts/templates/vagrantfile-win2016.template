@@ -1,0 +1,41 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  
+  # https://www.vagrantup.com/docs/vagrantfile/winrm_settings.html
+
+  config.vm.guest = :windows
+
+  config.vm.boot_timeout = 300
+
+  config.vm.communicator = "winrm"
+  config.winrm.transport = :plaintext
+  config.winrm.basic_auth_only = true
+
+  config.winrm.ssl_peer_verification = false
+
+  config.winrm.username = "vagrant"
+  config.winrm.password = "vagrant"
+
+  # network
+  config.vm.network :forwarded_port, guest: 3389, host: 3389, id: 'rdp', auto_correct: true
+
+  # defaults for virtualbox
+  config.vm.provider "virtualbox" do |v|
+    v.gui    = false
+    v.memory = 1024
+    v.cpus    = 2
+
+    v.customize ['modifyvm', :id, '--clipboard', 'bidirectional'] 
+    v.customize ["modifyvm", :id, "--vram", 32]
+
+    v.customize ["modifyvm", :id, "--audio", "none"]
+    v.customize ["modifyvm", :id, "--usb", "off"]
+
+    # https://github.com/hashicorp/vagrant/issues/6812#issuecomment-171981576
+    # Vagrant is reconnecting from scratch, sometimes literally before each command in negotiating loop
+    v.customize ['modifyvm', :id, "--natdnshostresolver1", "off"]
+  end
+  
+end

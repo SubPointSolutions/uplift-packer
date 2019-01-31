@@ -1,0 +1,8 @@
+{
+    "post-processors": [{
+        "type": "vagrant",
+        "keep_input_artifact": false,
+        "output": "{{user `uplf_vagrant_box_output`}}",
+        "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template"
+    }]
+}

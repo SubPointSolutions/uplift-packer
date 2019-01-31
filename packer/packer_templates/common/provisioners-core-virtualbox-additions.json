@@ -1,0 +1,26 @@
+{
+    "provisioners": [
+
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-core-virtualbox-additions] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/install-virtualboxadditions.ps1"
+            ],
+            "only": [
+                "virtualbox-iso"
+            ]
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-core-virtualbox-additions] provisioners'"
+        }
+
+    ]
+}

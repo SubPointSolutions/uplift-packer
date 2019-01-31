@@ -1,0 +1,7 @@
+{
+    "post-processors": [{
+        "type": "vagrant",
+        "keep_input_artifact": false,
+        "output": "{{user `uplf_vagrant_box_output`}}"
+    }]
+}

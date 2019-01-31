@@ -1,0 +1,32 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-box-spec-extractor] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_box-spec-creator.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_BOX_SPEC_FILE={{user `uplf_box_spec_file` }}"
+            ]
+        },
+
+        {
+            "type": "file",
+            "source": "{{user `uplf_box_spec_file` }}",
+            "destination": "{{user `uplf_box_spec_dest_folder` }}/box-spec.json",
+            "direction": "download"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-box-spec-extractor] provisioners'"
+        }
+
+    ]
+}
