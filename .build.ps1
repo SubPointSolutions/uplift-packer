@@ -16,6 +16,12 @@ param(
     $UPLF_SCRIPTS_PATH = $null,
     $UPLF_HTTP_DIRECTORY = $null,
 
+    # compression level to be used in post processor
+    # packer doco - 0 being no compression and 9 being the best compression. 
+    # by default, compression is enabled at level 6.
+    # https://packer.io/docs/post-processors/vagrant.html#compression_level
+    $UPLF_COMPRESSION_LEVEL = $null,
+
     # folder on a remote host to be used as
     # a temporary storage for file resources
     # - notmally, DO NOT CHANGE this one
@@ -361,6 +367,9 @@ task VagrantBoxTest {
             if ($null -ne $UPLF_VBMANAGE_MACHINEFOLDER) {
                 $ENV:UPLF_VBMANAGE_MACHINEFOLDER = $UPLF_VBMANAGE_MACHINEFOLDER
             }
+
+            # promote local http server port to vagrant test builds
+            $ENV:UPLF_BIN_REPO_HTTP_ADDR = ("10.0.2.2:" + $container.LocalHttpServerPort )
 
             Set-VagrantEnvVariables
 

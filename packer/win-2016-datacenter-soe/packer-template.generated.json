@@ -9,6 +9,7 @@
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
     "uplf_box_spec_dest_folder": "box-spec",
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
+    "uplf_compression_level": "6",
     "uplf_iso_url": "https://download.microsoft.com/download/1/6/F/16FA20E6-4662-482A-920B-1A45CF5AAE3C/14393.0.160715-1616.RS1_RELEASE_SERVER_EVAL_X64FRE_EN-US.ISO",
     "uplf_iso_checksum": "18a4f00a675b0338f3c7c93c4f131beb",
     "uplf_iso_checksum_type": "md5",
@@ -244,7 +245,8 @@
       "type": "vagrant",
       "keep_input_artifact": false,
       "output": "{{user `uplf_vagrant_box_output`}}",
-      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template"
+      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template",
+      "compression_level": "{{user `uplf_compression_level`}}"
     }
   ]
 }

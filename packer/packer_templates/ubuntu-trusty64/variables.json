@@ -3,6 +3,8 @@
         "uplf_input_box_name": "ubuntu/trusty64",
 
         "uplf_output_directory": "packer_builds/ubuntu-trusty64",
-        "uplf_vagrant_box_output": "packer_boxes/ubuntu-trusty64/ubuntu-trusty64.box"
+        "uplf_vagrant_box_output": "packer_boxes/ubuntu-trusty64/ubuntu-trusty64.box",
+
+        "uplf_compression_level" : "0"
     }
 }
