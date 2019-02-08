@@ -609,6 +609,7 @@ function New-PackerBuildContainer {
         VagrantTestScriptsFolder  = $vagrantTestScriptsFolder
         VagrantReleaseFile  = $vagrantReleaseFile
         LocalHttpServerJobId = $httpServerJob.Id
+        LocalHttpServerPort  = $port
         BuildId = [Guid]::NewGuid()
         GitBranchName = $branchName
         GitBranchCommit = $branchCommit
@@ -616,7 +617,6 @@ function New-PackerBuildContainer {
         BuildDir = $packerBuildFolder
     }
 }
-
 
 function Get-VariableOrEnvVariable($name, $value, $description) {
 

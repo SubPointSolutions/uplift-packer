@@ -7,6 +7,7 @@
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
     "uplf_box_spec_dest_folder": "box-spec",
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
+    "uplf_compression_level": "6",
     "uplf_invokeuplift_module_version": "",
     "uplf_uplift_core_module_version": "",
     "uplf_invokeuplift_module_repository": "",
@@ -198,12 +199,23 @@
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_packages.ps1",
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_setup-ps-nuget.ps1",
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift_resource_module.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_install-dsc-modules.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_install-dsc-modules.ps1"
       ],
       "environment_vars": [
         "UPLF_INVOKE_UPLIFT_MODULE_VERSION={{user `uplf_invokeuplift_module_version`}}",
         "UPLF_INVOKE_UPLIFT_MODULE_REPOSITORY={{user `uplf_invokeuplift_module_repository`}}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/tests/ps-modules.Tests.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
       ]
     },
     {
@@ -399,7 +411,8 @@
       "type": "vagrant",
       "keep_input_artifact": false,
       "output": "{{user `uplf_vagrant_box_output`}}",
-      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template"
+      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template",
+      "compression_level": "{{user `uplf_compression_level`}}"
     }
   ]
 }

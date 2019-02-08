@@ -14,6 +14,7 @@
     "uplf_box_spec_dest_folder": "box-spec",
     "uplf_disk_size": "100000",
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
+    "uplf_compression_level": "6",
     "uplf_input_box_name": "uplift-local/win-2016-datacenter-soe",
     "uplf_sp_product_key": "NQGJR-63HC8-XCRQH-MYVCH-3J3QR",
     "uplf_sp_resource_name": "ms-sharepoint2016-rtm",
@@ -249,7 +250,8 @@
       "type": "vagrant",
       "keep_input_artifact": false,
       "output": "{{user `uplf_vagrant_box_output`}}",
-      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template"
+      "vagrantfile_template": "{{user `uplf_scripts_path`}}/scripts/templates/vagrantfile-win2016.template",
+      "compression_level": "{{user `uplf_compression_level`}}"
     }
   ]
 }

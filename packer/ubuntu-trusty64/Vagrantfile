@@ -18,6 +18,24 @@ uplift.set_network_range("192.168.10")
 uplift.set_config_path("~/.uplift-packer-tests")
 uplift.set_vbmanage_machinefolder('all vms', '', machine_folder)
 
+$httpRepoTestScript = <<-SCRIPT
+ENDPOINT=$UPLF_BIN_REPO_HTTP_ADDR
+
+echo "Testing local http repo: $ENDPOINT"
+
+echo 'Raw output'
+wget --server-response $ENDPOINT
+
+echo 'Expecting 200 OK'
+wget --server-response $ENDPOINT
+[ $? -ne 0 ] && echo "[!] cannot fetch endpoint: $ENDPOINT" && exit 1
+
+echo "[+] OK!"
+
+exit 0
+
+SCRIPT
+
 Vagrant.configure("2") do |config|
   
   # additional plugins to be used with this vagrant config
@@ -33,8 +51,23 @@ Vagrant.configure("2") do |config|
     vm_config.vm.box_check_update = false
 
     # general check
-    config.vm.provision "shell", inline: "hostname"
+    config.vm.provision "shell", 
+      name: 'script-hostname',
+      inline: "hostname"
 
+    # if we run under invoke-build, then it is either PS or CI
+    # UPLF_BIN_REPO_HTTP_ADDR should be set automatically
+    # let's test and see is it's reachable, it is faster than running any of windows builds
+
+    if !ENV['UPLF_BIN_REPO_HTTP_ADDR'].nil?
+      config.vm.provision "shell", 
+        name: 'script-http-repo-check',
+        inline: $httpRepoTestScript,
+        env: {
+          'UPLF_BIN_REPO_HTTP_ADDR' => ENV['UPLF_BIN_REPO_HTTP_ADDR']
+        }
+    end
+    
     # virtualbox tuning
     vm_config.vm.provider "virtualbox" do |v|
       v.gui  = false

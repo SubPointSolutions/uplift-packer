@@ -19,6 +19,8 @@
         "uplf_box_spec_dest_folder": "box-spec",
 
         "uplf_disk_size": "100000",
-        "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1"
+        "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
+
+        "uplf_compression_level" : "6"
     }
 }

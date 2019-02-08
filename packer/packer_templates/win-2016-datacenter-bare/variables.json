@@ -10,6 +10,8 @@
         "uplf_vboxmanage_cpus": "4",
 
         "uplf_output_directory": "packer_builds/win-2016-datacenter-bare",
-        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-bare/win-2016-datacenter-bare.box"
+        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-bare/win-2016-datacenter-bare.box",
+
+        "uplf_compression_level" : "0"
     }
 }
