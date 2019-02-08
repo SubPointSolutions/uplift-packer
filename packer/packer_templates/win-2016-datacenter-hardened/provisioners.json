@@ -131,7 +131,7 @@
 
         {
             "type": "windows-restart",
-            "restart_timeout": "90m"
+            "restart_timeout": "120m"
         },
 
         {

@@ -23,6 +23,8 @@ $sp16LatestVariables  = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sp201
 $vs17Variables       = Get-JSON "$packerTemplatesPath/win-2016-datacenter-vs17/variables.json"
 $vs17Provisioners    = Get-JSON "$packerTemplatesPath/win-2016-datacenter-vs17/provisioners.json"
 
+$optimizeUplift    = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-optimize.json"
+
 $template = @{
     "builders"        = $coreBuilder.builders
     "variables"       = Merge-Objects `
@@ -36,7 +38,8 @@ $template = @{
                             $coreUplift.provisioners `
                             $sp16BinProvisioners.provisioners `
                             $specExtractor.provisioners `
-                            $vs17Provisioners.provisioners
+                            $vs17Provisioners.provisioners `
+                            $optimizeUplift.provisioners
 
     "post-processors" = $corePostProcessor.'post-processors'
 }

@@ -17,25 +17,23 @@ $corePostProcessor = Get-JSON "$packerTemplatesPath/common/post-processors-win-2
 $appVariables      = Get-JSON "$packerTemplatesPath/win-2016-datacenter-app/variables.json"
 $appProvision      = Get-JSON "$packerTemplatesPath/win-2016-datacenter-app/provisioners.json"
 
-$soeVariables            = Get-JSON "$packerTemplatesPath/win-2016-datacenter-soe/variables.json"
-$soeUpliftProvisioners   = Get-JSON "$packerTemplatesPath/win-2016-datacenter-soe/provisioners.json"
-
 $specExtractor     = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-box-spec-extractor.json"
+
+$optimizeUplift    = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-optimize.json"
 
 $template = @{
     "builders"        = $coreBuilder.builders
 
     "variables"       = Merge-Objects `
                             $coreVaiables.variables `
-                            $soeVariables.variables `
                             $appVariables.variables
 
     "provisioners"    = Merge-ObjectsAsArray `
                             $coreBuilder.provisioners `
                             $coreUplift.provisioners `
-                            $soeUpliftProvisioners.provisioners `
                             $appProvision.provisioners `
-                            $specExtractor.provisioners
+                            $specExtractor.provisioners `
+                            $optimizeUplift.provisioners
 
     "post-processors" = $corePostProcessor.'post-processors'
 }

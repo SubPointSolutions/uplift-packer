@@ -1,0 +1,49 @@
+
+
+# packer 
+**/packer_cache/**/*
+**/packer_builds/**/*
+**/packer_boxes/**/*
+**/packer/build/**/*
+
+# vagrant
+**/.vagrant/**/*
+**/.vagrant.d/**/*
+
+# puppet
+**/puppet/ssl/**/*
+
+# kitchen
+**/.kitchen/**/*
+
+**/.uplift.vagrant.yaml
+
+uplift-download/repo
+
+gocd/server/godata
+uplift-download/uplift-repository
+
+node_modules
+**/.build/**/*
+.build
+
+**/*.gem
+uplift-packer\packer\packer_templates
+
+uplift-packer/packer-ci-build/**/*
+uplift-vagrant/vagrant-uplift/Gemfile.lock
+
+Gemfile.lock
+
+# all build folders
+build-*
+
+# all output folders
+output
+
+# all uplift local repositories
+uplift-local-repository
+uplift-local-resources
+
+tests/**/*
+tests@tmp/**/*

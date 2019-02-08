@@ -37,7 +37,7 @@ Write-UpliftMessage "Running DSC: SP2013_InstallPrereqs"
 Configuration SP2013_RTM_InstallPrereqs_Online
 {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName SharePointDsc
+    Import-DscResource -ModuleName SharePointDsc -ModuleVersion "1.9.0.0"
 
     node "localhost"
     {
@@ -53,7 +53,7 @@ Configuration SP2013_RTM_InstallPrereqs_Online
 Configuration SP2013_RTM_InstallPrereqs_Offline
 {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName SharePointDsc
+    Import-DscResource -ModuleName SharePointDsc -ModuleVersion "1.9.0.0"
 
     node "localhost"
     {

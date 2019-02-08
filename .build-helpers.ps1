@@ -4,22 +4,51 @@
     }
 }
 
-Confirm-PowerShell
+function Write-BuildInfoMessage {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "", Scope="Function")]
+    param (
+        $msg 
+    )
 
-function Write-BuildInfoMessage($msg) {
-    Write-Build Green $msg  | Out-Null
+    Write-Host $msg -ForegroundColor Green
 }
 
-function Write-BuildErrorMessage($msg) {
-    Write-Build Red $msg | Out-Null
+function Write-BuildDebugMessage {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "", Scope="Function")]
+    param (
+        $msg 
+    )
+
+    if($ENV:UPLF_LOG_LEVEL -eq "DEBUG") {
+        Write-Host $msg -ForegroundColor Blue
+    }
 }
 
-function Write-BuildWarnMessage($msg) {
-    Write-BuildWarningMessage $msg | Out-Null
+function Write-BuildErrorMessage {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "", Scope="Function")]
+    param (
+        $msg 
+    )
+
+    Write-Host $msg -ForegroundColor Red
 }
 
-function Write-BuildWarningMessage($msg) {
-    Write-Build Yellow $msg | Out-Null
+function Write-BuildWarnMessage {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "", Scope="Function")]
+    param (
+        $msg 
+    )
+
+    Write-Host $msg -ForegroundColor Yellow
+}
+
+function Write-BuildWarningMessage {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "", Scope="Function")]
+    param (
+        $msg 
+    )
+
+    Write-Host $msg -ForegroundColor Yellow
 }
 
 function Get-PackerImageName($name) {
@@ -37,7 +66,7 @@ function Get-LowerName($name) {
 function Confirm-ExitCode($code, $message)
 {
     if ($code -eq 0) {
-        Write-Build Green "Exit code is 0, continue..."
+        Write-BuildInfoMessage "Exit code is 0, continue..."
     } else {
         $errorMessage = "Exiting with non-zero code [$code] - $message"
 
@@ -125,7 +154,7 @@ function Set-EnvVariables {
         $prefix
     )
 
-    Write-Build Green " [~] setting vagrant ENV variables"
+    Write-BuildInfoMessage " [~] setting vagrant ENV variables"
 
     # env
     $variables = Get-ChildItem Env: `
@@ -135,7 +164,7 @@ function Set-EnvVariables {
         $name  = $variable.Name
         $value = $variable.Value
 
-        if($null -eq $value) {
+        if([String]::IsNullOrEmpty($value) -eq $True) {
             continue
         }
 
@@ -153,7 +182,7 @@ function Set-EnvVariables {
         $name  = $variable.Name
         $value = $variable.Value
 
-        if($null -eq $value) {
+        if([String]::IsNullOrEmpty($value) -eq $True) {
             continue
         }
 
@@ -295,6 +324,22 @@ function Get-PackerImageFile($name) {
     return "packer/$name/packer-template.generated.json"
 }
 
+function Test-HttpUrl($url) {
+
+    Write-BuildInfoMessage "[~] checking url: $url"
+    
+    $result = Invoke-WebRequest "$url" `
+        -UseBasicParsing `
+        -DisableKeepAlive `
+        -Method HEAD 
+
+    if($result.StatusCode -eq 200) {
+        Write-BuildInfoMessage  "[+] StatusCode: $($result.StatusCode) for url: $url"
+    } else {
+        throw "[!] StatusCode: $($result.StatusCode), expected 200!"
+    }
+}
+
 function Start-LocalHttpServer {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSShouldProcess", "", Scope="Function")]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Scope="Function")]
@@ -304,7 +349,7 @@ function Start-LocalHttpServer {
         $path
     )
 
-    Write-BuildInfoMessage " [+] Starting http-server to server packer/vagrant builds"
+    Write-BuildInfoMessage "[~] Starting http-server to serve packer/vagrant builds"
     Write-BuildInfoMessage " - port : $port"
     Write-BuildInfoMessage " - local: localhost:$port"
     Write-BuildInfoMessage " - vm   : 10.0.2.2:$port"
@@ -317,7 +362,22 @@ function Start-LocalHttpServer {
         throw $errorMessage
     }
 
+    $httpServerTool = Get-ToolCmd("http-server") 
+
+    if($null -eq $httpServerTool) {
+        $errMessage = "http-server tool is not here. Use 'npm install http-server -g' to install it - https://www.npmjs.com/package/http-server"
+        
+        Write-BuildErrorMessage $errMessage
+        throw $errMessage
+    }
+
     $job = http-server $path -p $port &
+
+    Write-BuildInfoMessage "Pause 5 sec allowing http-server to start..."
+    Start-Sleep 5
+
+    Test-HttpUrl "http://localhost:$port"
+
     return $job
 }
 
@@ -373,7 +433,7 @@ function Find-DefaultLocalRepositoryPath() {
     return $result
 }
 
-function New-PackerBuildContainer {
+function New-UpliftHttpServerSession {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSShouldProcess", "", Scope="Function")]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Scope="Function")]
     param(
@@ -383,21 +443,36 @@ function New-PackerBuildContainer {
     $packerFileName = Get-PackerImageFile $imageName
     $packerTemplate = Get-Content $packerFileName -Raw
 
+    $httpServerJob = $null
+    $port = $null
+
     if($null -eq $UPLF_HTTP_DIRECTORY) {
-        Write-BuildWarnMessage " [!] UPLF_HTTP_DIRECTORY is null, trying to resolve default local repository paths"
+        Write-BuildInfoMessage " [!] UPLF_HTTP_DIRECTORY is null, trying to resolve default local repository paths"
 
         $defaultLocalRepositoryPath = Find-DefaultLocalRepositoryPath
        
         if($null -ne $defaultLocalRepositoryPath) {
-            Write-BuildWarnMessage " [+] UPLF_HTTP_DIRECTORY is set: $defaultLocalRepositoryPath"
+            Write-BuildInfoMessage " [+] UPLF_HTTP_DIRECTORY is set: $defaultLocalRepositoryPath"
             $UPLF_HTTP_DIRECTORY = $defaultLocalRepositoryPath
         } else {
-            Write-BuildWarnMessage " [!] no default local repository was found"
+            Write-BuildInfoMessage " [!] no default local repository was found"
         }
     }
 
-    if($null -ne $UPLF_HTTP_DIRECTORY) {
+    if( [String]::IsNullOrEmpty($UPLF_HTTP_DIRECTORY) -eq $false) {
+        if( (Test-Path $UPLF_HTTP_DIRECTORY) -eq $false) {
+            $errMessage = "[!] Path does not exist: $UPLF_HTTP_DIRECTORY"
+
+            Write-BuildErrorMessage $errMessage
+            throw $errMessage
+        }
+
         $port = Get-RandomUsablePort
+
+        #Write-BuildInfoMessage "Starting local http server"
+        #Write-BuildInfoMessage " - dir : $UPLF_HTTP_DIRECTORY"
+        #Write-BuildInfoMessage " - port: $port"
+
         $httpServerJob  = Start-LocalHttpServer $port $UPLF_HTTP_DIRECTORY
     }
     else {
@@ -409,13 +484,41 @@ function New-PackerBuildContainer {
 
     if($packerTemplate.ToLower().Contains("_resource_name") -eq $True) {
 
-        if($null -eq $UPLF_HTTP_DIRECTORY) {
+        if([String]::IsNullOrEmpty($UPLF_HTTP_DIRECTORY) -eq $True) {
             $errorMessage = " [!] This packer template specifies one or more HTTP bases resources. Set UPLF_HTTP_DIRECTORY variable to start local http-server"
 
             Write-BuildErrorMessage $errorMessage
             throw $errorMessage
         }
+
+        if( (Test-Path $UPLF_HTTP_DIRECTORY) -eq $false) {
+            $errorMessage = " [!] Path does not exist: $UPLF_HTTP_DIRECTORY"
+
+            Write-BuildErrorMessage $errorMessage
+            throw $errorMessage
+        }
     }
+
+    return (New-Object PSObject –Property @{
+        HttpServerJob = $httpServerJob
+        HttpPort = $port
+    })
+}
+
+function New-PackerBuildContainer {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSShouldProcess", "", Scope="Function")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseShouldProcessForStateChangingFunctions", "", Scope="Function")]
+    param(
+        $imageName,
+        $httpServerSession
+    )
+
+    Write-BuildInfoMessage "Creating build container for image: $imageName" 
+
+    $port = $httpServerSession.HttpPort
+
+    $packerFileName = Get-PackerImageFile $imageName
+    $packerTemplate = Get-Content $packerFileName -Raw
 
     $branchName   = Get-GitBranchName $UPLF_GIT_BRANCH
     $branchCommit = Get-GitCommit $UPLF_GIT_COMMIT
@@ -424,9 +527,9 @@ function New-PackerBuildContainer {
     $packerUniqueImageName = "$packerImageName-$branchName"
     $publishingBoxName = $packerImageName
 
-    Write-Build Green "building image: $packerImageName, file: $packerFileName" | Out-Null
-    Write-Build Green " - branchName  : $branchName" | Out-Null
-    Write-Build Green " - branchCommit: $branchCommit" | Out-Null
+    Write-BuildInfoMessage "Image: $packerImageName, file: $packerFileName" 
+    Write-BuildInfoMessage " - branchName  : $branchName" 
+    Write-BuildInfoMessage " - branchCommit: $branchCommit" 
 
     $containerFolder    = "build-packer-ci-local"
     $packerBuildFolder  = "$containerFolder/$packerUniqueImageName"
@@ -459,13 +562,21 @@ function New-PackerBuildContainer {
     # $scriptPath      = [String](Resolve-Path -Path "packer")
     $scriptPath = "packer"
    
-    New-PackerVariablesFile "$packerBuildFolder/variables.json" @{
+    $packerVariablesHash = @{
         "UPLF_scripts_path"         = $scriptPath
-        "UPLF_BIN_REPO_HTTP_ADDR"   = "10.0.2.2:$port"
         "UPLF_output_directory"     = $packerOutputDir
         "UPLF_vagrant_box_output"   = $vagrantBoxFile
         "uplf_box_spec_dest_folder" = $packerBoxSpecBuildFolder
     }
+
+    if([String]::IsNullOrEmpty($port) -eq $False) {
+        # check that local server is up
+        Test-HttpUrl "http://localhost:$port"
+
+        $packerVariablesHash["UPLF_BIN_REPO_HTTP_ADDR"] = "10.0.2.2:$port";
+    } 
+
+    New-PackerVariablesFile "$packerBuildFolder/variables.json" $packerVariablesHash
 
     $vagrantBoxName   = "uplift-local/$packerUniqueImageName"
     $vagrantBoxes = [String]((vagrant box list) |  Out-String)
@@ -479,9 +590,10 @@ function New-PackerBuildContainer {
     # copy packer file
     Copy-Item $packerFileName "$packerBuildFolder/packer.json" -Force
 
-    return (New-Object PSObject –Property @{
+    return New-Object PSObject –Property @{
         PackerFile = "$packerBuildFolder/packer.json"
         PackerBoxSpecFolder = "$packerBoxSpecBuildFolder"
+        PackerImageName = $imageName
         VariablesFile = "$packerBuildFolder/variables.json"
         VagrantBoxFile = $vagrantBoxFile
         VagrantBoxFileExists = (Test-Path $vagrantBoxFile)
@@ -497,7 +609,12 @@ function New-PackerBuildContainer {
         VagrantTestScriptsFolder  = $vagrantTestScriptsFolder
         VagrantReleaseFile  = $vagrantReleaseFile
         LocalHttpServerJobId = $httpServerJob.Id
-    })
+        BuildId = [Guid]::NewGuid()
+        GitBranchName = $branchName
+        GitBranchCommit = $branchCommit
+        BuildDateTime = [DateTime]::Now.ToString("yyyy-MM-ddTHH:mm:fffffffK")
+        BuildDir = $packerBuildFolder
+    }
 }
 
 
@@ -525,22 +642,33 @@ function Confirm-SecterVariableName($name) {
 }
 
 function Invoke-PackerBuild($force = $false) {
-    if ($container.VagrantBoxFileExists -eq $false -or $force -eq $true) {
-        Write-Build Yellow " [~] box does not exist, creating a new one..."
+    if ($container.VagrantBoxExists -eq $false -or $force -eq $true) {
+        
+        if($container.VagrantBoxExists -eq $true) {
+            Write-BuildWarningMessage " [~] box exist, force flag: $force "
+        } else {
+            Write-BuildWarningMessage " [~] box does not exist, force flag: $force "
+        }
 
         exec {
             Set-PackerEnvVariables
 
-            packer build `
-                -force `
-                -var-file="$($container.VariablesFile)" `
-                "$($container.PackerFile)"
+            if($force -eq $True) {
+                packer build `
+                    -force `
+                    -var-file="$($container.VariablesFile)" `
+                    "$($container.PackerFile)"
+            } else {
+                packer build `
+                    -var-file="$($container.VariablesFile)" `
+                    "$($container.PackerFile)"
+            }
 
             Confirm-ExitCode $LASTEXITCODE "Failed: packer build"
         }
     }
     else {
-        Write-Build Green " [+] box file exists: $($container.VagrantBoxFile)"
+        Write-BuildInfoMessage " [+] box exists!"
     }
 }
 
@@ -556,36 +684,42 @@ function Get-FileSizeInGb($path) {
 
 function Invoke-VagrantBoxAdd($force = $false) {
 
-    $boxSize = Get-FileSizeInGb($container.VagrantBoxFile)
+    if( (Test-Path $container.VagrantBoxFile) -eq $True) {
 
-    if ($container.VagrantBoxExists -eq $false -or $force -eq $True) {
         $boxSize = Get-FileSizeInGb($container.VagrantBoxFile)
 
-        Write-Build Yellow " [~] vagrant box was not added, adding..."
+        if ($container.VagrantBoxExists -eq $false -or $force -eq $True) {
+            $boxSize = Get-FileSizeInGb($container.VagrantBoxFile)
 
-        Write-Build Yellow " - name: $($container.VagrantBoxName)"
-        Write-Build Yellow " - size: $boxSize"
-        Write-Build Yellow " - src : $($container.VagrantBoxFile)"
+            Write-BuildWarningMessage " [~] vagrant box was not added, adding..."
 
-        exec {
-            Set-VagrantEnvVariables
+            Write-BuildWarningMessage " - name: $($container.VagrantBoxName)"
+            Write-BuildWarningMessage " - size: $boxSize"
+            Write-BuildWarningMessage " - src : $($container.VagrantBoxFile)"
 
-            vagrant box add `
-                $container.VagrantBoxFile `
-                --name  $container.VagrantBoxName `
-                --force
+            exec {
+                Set-VagrantEnvVariables
+
+                vagrant box add `
+                    $container.VagrantBoxFile `
+                    --name  $container.VagrantBoxName `
+                    --force
+            }
+
+            Write-BuildWarningMessage " [~] removing box file..."
+            Remove-Item $container.VagrantBoxFile -Force
         }
+        else {
+            $boxSize = Get-FileSizeInGb($container.VagrantBoxFile)
 
-        Write-Build Yellow " [~] removing box file..."
-        Remove-Item $container.VagrantBoxFile -Force
-    }
-    else {
-        $boxSize = Get-FileSizeInGb($container.VagrantBoxFile)
-
-        Write-Build Green " [+] vagrant box was already added"
-        Write-Build Green " - name: $($container.VagrantBoxName)"
-        Write-Build Green " - size: $boxSize"
-        Write-Build Green " - src : $($container.VagrantBoxFile)"
+            Write-BuildInfoMessage " [+] vagrant box was already added"
+            Write-BuildInfoMessage " - name: $($container.VagrantBoxName)"
+            Write-BuildInfoMessage " - size: $boxSize"
+            Write-BuildInfoMessage " - src : $($container.VagrantBoxFile)"
+        }
+    } else {
+        Write-BuildInfoMessage " [~] vagrant box file does not exist: $($container.VagrantBoxFile)"
+        Write-BuildInfoMessage " [~] most likely, box exists and no-force build is used"
     }
 }
 
@@ -813,12 +947,14 @@ function Delete-LinkedCloneVMs() {
         $vmId   = $vmPair[1]
 
         if( ($vmName -match "uplift-virtualbox-iso-*_*_*") -eq $True) {
-            Write-Build Yellow "[!] linked clone vm: $vmName id: $vmId"
+            Write-BuildWarningMessage "[!] linked clone vm: $vmName id: $vmId"
 
-            Write-Build Yellow "[!] Deleting linked clone: $vmName"
+            Write-BuildWarningMessage "[!] Deleting linked clone: $vmName"
             vboxmanage unregistervm $vmName --delete
         }  else {
-            Write-Build Green "[+] regular vm: $vmName"
+            Write-BuildInfoMessage "[+] regular vm: $vmName"
         }
     }
 }
+
+Confirm-PowerShell

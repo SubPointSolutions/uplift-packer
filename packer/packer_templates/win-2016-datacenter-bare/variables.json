@@ -4,7 +4,7 @@
         "uplf_iso_checksum": "18a4f00a675b0338f3c7c93c4f131beb",
         "uplf_iso_checksum_type": "md5",
 
-        "uplf_disk_size": "61440",
+        "uplf_disk_size": "80000",
 
         "uplf_vboxmanage_memory": "4096",
         "uplf_vboxmanage_cpus": "4",

@@ -7,6 +7,8 @@
     "uplf_git_commit": "",
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
     "uplf_box_spec_dest_folder": "box-spec",
+    "uplf_disk_size": "100000",
+    "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_sp_product_key": "NQGJR-63HC8-XCRQH-MYVCH-3J3QR",
     "uplf_sp_resource_name": "ms-sharepoint2016-rtm",
     "uplf_sp_lang_pack_resource_names": "ms-sharepoint2016-lang-pack-ar-sa,ms-sharepoint2016-lang-pack-cs-cz,ms-sharepoint2016-lang-pack-da-dk,ms-sharepoint2016-lang-pack-de-de,ms-sharepoint2016-lang-pack-fr-fr,ms-sharepoint2016-lang-pack-fi-fi,ms-sharepoint2016-lang-pack-nl-nl,ms-sharepoint2016-lang-pack-he-il,ms-sharepoint2016-lang-pack-hi-in,ms-sharepoint2016-lang-pack-kk-kz,ms-sharepoint2016-lang-pack-it-it,ms-sharepoint2016-lang-pack-lv-lv,ms-sharepoint2016-lang-pack-pl-pl,ms-sharepoint2016-lang-pack-ru-ru,ms-sharepoint2016-lang-pack-ro-ro,ms-sharepoint2016-lang-pack-es-es,ms-sharepoint2016-lang-pack-sv-se,ms-sharepoint2016-lang-pack-uk-ua",
@@ -16,10 +18,10 @@
     "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-vs17/win-2016-datacenter-vs17.box",
     "uplf_vs17_resource_name": "ms-visualstudio-2017.ent-dist-office-dev",
     "uplf_vs17_executable_name": "vs_enterprise.exe",
-    "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension",
+    "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension;Microsoft.VisualStudio.Workload.Azure",
     "uplf_vs17_package_count": "400",
     "uplf_bin_repo_http_addr": "10.0.2.2:9091",
-    "uplf_vboxmanage_cpuexecutioncap": "80",
+    "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_vboxmanage_cpus": "4",
     "uplf_vboxmanage_memory": "4096"
   },
@@ -72,7 +74,7 @@
     {
       "type": "file",
       "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
-      "destination": "c:/Windows/Temp/_uplift_winrm.ps1"
+      "destination": "{{user `uplf_winrm_task_file_path` }}"
     },
     {
       "type": "powershell",
@@ -117,6 +119,41 @@
     {
       "type": "shell-local",
       "command": "echo 'Starting [provisioners-uplift-sharepoint2016-binm] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_packages.dsc.ps1"
+      ],
+      "environment_vars": []
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_config.dsc.ps1"
+      ],
+      "environment_vars": []
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_config.dsc.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_DSC_CHECK=1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest"
+      ]
     },
     {
       "type": "powershell",

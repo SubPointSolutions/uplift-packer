@@ -11,7 +11,7 @@
         "uplf_output_directory": "packer_builds/win2016-mb-soe-hardened",
         "uplf_vagrant_box_output": "packer_boxes/win2016-mb-soe-hardened-bare/win2016-mb-soe-hardened.box",
 
-        "uplf_disk_size": "61440",
+        "uplf_disk_size": "100000",
 
         "uplf_vboxmanage_memory": "4096",
         "uplf_vboxmanage_cpus": "4",

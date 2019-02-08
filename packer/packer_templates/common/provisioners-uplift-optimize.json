@@ -1,0 +1,22 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-optimize] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_optimize-image.ps1"
+            ]
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-optimize] provisioners'"
+        }
+
+    ]
+}
