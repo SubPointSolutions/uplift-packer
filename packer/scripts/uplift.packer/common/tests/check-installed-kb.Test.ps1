@@ -1,7 +1,7 @@
 ﻿Import-Module Uplift.Core
 
 $kbNames = (Get-UpliftEnvVariable 'UPLF_TEST_KB_NAMES').Split(';')
-`
+
 Describe 'Installed KBs' {
 
     Context "KB" {

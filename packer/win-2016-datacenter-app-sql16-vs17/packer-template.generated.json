@@ -155,12 +155,23 @@
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_packages.ps1",
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_setup-ps-nuget.ps1",
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift_resource_module.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_install-dsc-modules.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_install-dsc-modules.ps1"
       ],
       "environment_vars": [
         "UPLF_INVOKE_UPLIFT_MODULE_VERSION={{user `uplf_invokeuplift_module_version`}}",
         "UPLF_INVOKE_UPLIFT_MODULE_REPOSITORY={{user `uplf_invokeuplift_module_repository`}}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/tests/ps-modules.Tests.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
       ]
     },
     {

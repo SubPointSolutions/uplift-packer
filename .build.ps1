@@ -113,7 +113,7 @@ $container = $null;
 
 function Get-AppInsightProperties($container) {
     if($container -eq $null) {
-        reutrn $null   
+        return $null   
     }
 
     $hash = @{
