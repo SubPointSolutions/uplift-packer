@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_version ">= 2.2.3"
+
+# vagrant box names
+box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/ubuntu-trusty64-master" 
+machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
+linked_clone   =  ENV['UPLF_VAGRANT_LINKED_CLONE'].nil? == false
+
+vm_name_client  = "ubuntu-cl"
+
+# uplift helper for vagrant configurations
+uplift = VagrantPlugins::Uplift::Config()
+
+# base uplif configuration
+uplift.set_network_range("192.168.10")
+uplift.set_config_path("~/.uplift-packer-tests")
+uplift.set_vbmanage_machinefolder('all vms', '', machine_folder)
+
+Vagrant.configure("2") do |config|
+  
+  # additional plugins to be used with this vagrant config
+  config.vagrant.plugins = [
+    "vagrant-reload",
+    "vagrant-uplift"
+  ]
+
+  config.vm.define(vm_name_client) do | vm_config |   
+    
+    # box config
+    vm_config.vm.box = box_name
+    vm_config.vm.box_check_update = false
+
+    # general check
+    config.vm.provision "shell", inline: "hostname"
+
+    # virtualbox tuning
+    vm_config.vm.provider "virtualbox" do |v|
+      v.gui  = false
+      
+      v.cpus    = 2
+      v.memory  = 512
+
+      v.linked_clone = linked_clone
+    end
+  end
+
+end

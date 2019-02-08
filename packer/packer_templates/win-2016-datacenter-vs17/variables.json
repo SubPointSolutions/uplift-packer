@@ -8,12 +8,12 @@
         "uplf_vs17_resource_name": "ms-visualstudio-2017.ent-dist-office-dev",
         
         "uplf_vs17_executable_name": "vs_enterprise.exe",
-        "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension",
+        "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension;Microsoft.VisualStudio.Workload.Azure",
         "uplf_vs17_package_count": "400",
 
         "uplf_bin_repo_http_addr": "10.0.2.2:9091",
 
-        "uplf_vboxmanage_cpuexecutioncap": "80",
+        "uplf_vboxmanage_cpuexecutioncap": "100",
         "uplf_vboxmanage_cpus": "4",
         "uplf_vboxmanage_memory": "4096"
     }

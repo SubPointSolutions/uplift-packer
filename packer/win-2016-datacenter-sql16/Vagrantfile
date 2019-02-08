@@ -22,17 +22,17 @@ Vagrant.configure("2") do |config|
     vm_config.vm.box = box_name
     vm_config.vm.box_check_update = false
 
-    uplift.uplift_synced_folder(vm_name_sql, vm_config)
-    uplift.uplift_6Gb(vm_name_sql, vm_config)
-    uplift.uplift_hostname(vm_name_sql, vm_config, vm_name_sql)    
+    uplift.set_default_synced_folder(vm_name_sql, vm_config)
+    uplift.set_6Gb(vm_name_sql, vm_config)
+    uplift.set_hostname(vm_name_sql, vm_config, vm_name_sql)    
     
     # client 
-    uplift.uplift_client_network(vm_name_sql, vm_config, vm_name_sql)
-    uplift.uplift_win16_dsc_base(vm_name_sql, vm_config)
-    uplift.uplift_dc_join(vm_name_sql, vm_config)
+    uplift.set_client_network(vm_name_sql, vm_config, vm_name_sql)
+    uplift.provision_win16_dsc_soe(vm_name_sql, vm_config)
+    uplift.provision_dc_join(vm_name_sql, vm_config)
 
     # complete sql image
-    uplift.uplift_sql(vm_name_sql, vm_config)
+    uplift.provision_sql16_complete_image(vm_name_sql, vm_config)
 
     vm_config.vm.provision "shell", name: "hostname check", inline: "hostname"
 

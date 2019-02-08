@@ -1,11 +1,12 @@
 {
   "variables": {
     "uplf_local_repository_path": "c:/_uplift_resources",
-    "uplf_vboxmanage_cpuexecutioncap": "80",
+    "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_git_branch": "",
     "uplf_git_commit": "",
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
     "uplf_box_spec_dest_folder": "box-spec",
+    "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_invokeuplift_module_version": "",
     "uplf_uplift_core_module_version": "",
     "uplf_invokeuplift_module_repository": "",
@@ -17,7 +18,7 @@
     "uplf_iso_checksum_type": "md5",
     "uplf_output_directory": "packer_builds/win2016-mb-soe-hardened",
     "uplf_vagrant_box_output": "packer_boxes/win2016-mb-soe-hardened-bare/win2016-mb-soe-hardened.box",
-    "uplf_disk_size": "61440",
+    "uplf_disk_size": "100000",
     "uplf_vboxmanage_memory": "4096",
     "uplf_vboxmanage_cpus": "4",
     "uplf_ssu_resource_name": "ms-win2016-ssu-2018.05.17-kb4132216",
@@ -104,7 +105,7 @@
     {
       "type": "file",
       "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
-      "destination": "c:/Windows/Temp/_uplift_winrm.ps1"
+      "destination": "{{user `uplf_winrm_task_file_path` }}"
     },
     {
       "type": "powershell",
@@ -349,7 +350,7 @@
     },
     {
       "type": "windows-restart",
-      "restart_timeout": "90m"
+      "restart_timeout": "120m"
     },
     {
       "type": "shell-local",
@@ -377,6 +378,20 @@
     {
       "type": "shell-local",
       "command": "echo 'Completed [provisioners-uplift-box-spec-extractor] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [provisioners-uplift-optimize] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_optimize-image.ps1"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [provisioners-uplift-optimize] provisioners'"
     }
   ],
   "post-processors": [

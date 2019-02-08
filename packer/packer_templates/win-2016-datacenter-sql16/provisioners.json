@@ -33,6 +33,16 @@
         {
             "type": "powershell",
             "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/sql-image-packages.ps1"
+            ],
+            "environment_vars": [
+                
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
                 "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/install-sql-studio.dsc.ps1"
             ],
             "environment_vars": [

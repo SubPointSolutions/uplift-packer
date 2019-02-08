@@ -13,7 +13,7 @@ $productKey = Get-UpliftEnvVariable "UPLF_SP_PRODUCT_KEY"
 Configuration SP2013_InstallBin
 {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName SharePointDsc
+    Import-DscResource -ModuleName SharePointDsc -ModuleVersion "1.9.0.0"
 
     node "localhost"
     {
