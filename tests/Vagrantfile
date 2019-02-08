@@ -12,7 +12,7 @@ uplift.set_config_path("~/.uplift-packer-tests")
 box_dc       = ENV['UPLF_VAGRANT_DC_BOX_NAME'] || "uplift-local/win-2016-datacenter-soe-latest-master" 
 linked_clone = ENV['UPLF_VAGRANT_LINKED_CLONE'].nil? == false
 
-uplift.uplift_set_vbmanage_machinefolder('', '', nil)
+uplift.set_vbmanage_machinefolder('', '', nil)
 
 vm_dc = "dc16-shared"
 
@@ -24,22 +24,22 @@ Vagrant.configure("2") do |config|
     vm_config.vm.box = box_dc
 
     # standard config
-    uplift.uplift_synced_folder(vm_dc, vm_config)
-    uplift.uplift_2Gb(vm_dc, vm_config)
-    uplift.uplift_hostname(vm_dc, vm_config, vm_dc)
+    uplift.set_default_synced_folder(vm_dc, vm_config)
+    uplift.set_2Gb(vm_dc, vm_config)
+    uplift.set_hostname(vm_dc, vm_config, vm_dc)
     
     # always setup correct networking
-    uplift.uplift_private_dc_network(vm_dc, vm_config)
+    uplift.set_private_dc_network(vm_dc, vm_config)
     
     # uplift baseline
     if !uplift.has_checkpoint?(vm_dc, 'dsc-soe') 
-      uplift.uplift_win16_dsc_base(vm_dc, vm_config)
+      uplift.provision_win16_dsc_soe(vm_dc, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
     end
 
     # uplift dc creation
     if !uplift.has_checkpoint?(vm_dc, 'dc-creation') 
-      uplift.uplift_dc16(vm_dc, vm_config)
+      uplift.provision_dc16(vm_dc, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dc-creation'
     end
 

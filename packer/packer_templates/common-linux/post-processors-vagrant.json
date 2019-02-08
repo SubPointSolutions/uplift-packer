@@ -2,6 +2,7 @@
     "post-processors": [{
         "type": "vagrant",
         "keep_input_artifact": false,
-        "output": "{{user `uplf_vagrant_box_output`}}"
+        "output": "{{user `uplf_vagrant_box_output`}}",
+        "compression_level": "{{user `uplf_compression_level`}}"
     }]
 }
