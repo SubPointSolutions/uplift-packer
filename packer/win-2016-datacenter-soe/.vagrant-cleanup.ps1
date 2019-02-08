@@ -1,1 +1,1 @@
-vagrant destroy client -f
+vagrant destroy -f

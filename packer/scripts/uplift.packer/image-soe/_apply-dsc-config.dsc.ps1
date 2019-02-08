@@ -12,7 +12,7 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 # this one must exists
 # we start a task later to re-enable WinRM after sysprep
 # packer provision brings it there, and then DSC uses it to setup startup task
-$winrmTaskFile = "c:/Windows/Temp/_uplift_winrm.ps1"
+$winrmTaskFile = Get-UpliftEnvVariable "UPLF_WINRM_TASK_FILE_PATH" "" "c:/uplift_scripts/uplift_winrm.ps1"
 
 if ( (Test-Path $winrmTaskFile) -eq $False ) {
     throw "Cannot find winrm task file: $winrmTaskFile"

@@ -9,12 +9,11 @@ The uplift project is split into several repositories to address particular a pi
 * [uplift-powershell](https://github.com/SubPointSolutions/uplift-powershell) - reusable PowerShell modules
 * [uplift-packer](https://github.com/SubPointSolutions/uplift-packer) - Packer templates for SharePoint professionals
 * [uplift-vagrant](https://github.com/SubPointSolutions/uplift-vagrant) - Vagrant plugin to simplify Windows infrastructure provisioning 
+* [uplift-cicd-jenkins2](https://github.com/SubPointSolutions/uplift-cicd-jenkins2) - Jenkins server and pipelines to build uplift Packer images and Vagrant boxes
 
 The current repository houses Packer templates and automation which is used to produces Vagrant boxes across the uplift project.
 
 ## Packer builds
-
-## Local development workflow
 Local development automation uses [Invoke-Build](https://github.com/nightroman/Invoke-Build) based tasks.
 
 To get started, get the latest `dev` branch or fork the repo on the GitHub:

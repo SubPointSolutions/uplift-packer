@@ -3,15 +3,16 @@
     "uplf_http_directory": "",
     "uplf_scripts_path": "./../",
     "uplf_local_repository_path": "c:/_uplift_resources",
-    "uplf_vboxmanage_cpuexecutioncap": "80",
+    "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_git_branch": "",
     "uplf_git_commit": "",
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
     "uplf_box_spec_dest_folder": "box-spec",
+    "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_iso_url": "https://download.microsoft.com/download/1/6/F/16FA20E6-4662-482A-920B-1A45CF5AAE3C/14393.0.160715-1616.RS1_RELEASE_SERVER_EVAL_X64FRE_EN-US.ISO",
     "uplf_iso_checksum": "18a4f00a675b0338f3c7c93c4f131beb",
     "uplf_iso_checksum_type": "md5",
-    "uplf_disk_size": "61440",
+    "uplf_disk_size": "80000",
     "uplf_vboxmanage_memory": "4096",
     "uplf_vboxmanage_cpus": "4",
     "uplf_output_directory": "packer_builds/win-2016-datacenter-bare",
@@ -94,7 +95,7 @@
     {
       "type": "file",
       "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
-      "destination": "c:/Windows/Temp/_uplift_winrm.ps1"
+      "destination": "{{user `uplf_winrm_task_file_path` }}"
     },
     {
       "type": "powershell",

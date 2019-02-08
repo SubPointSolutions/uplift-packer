@@ -29,7 +29,7 @@ param(
 
     $UPLF_VBOXMANAGE_MEMORY = $null,
     $UPLF_VBOXMANAGE_CPUS = $null,
-    $UPLF_VBOXMANAGE_CPUEXECUTIONCAP = "80",
+    $UPLF_VBOXMANAGE_CPUEXECUTIONCAP = "100",
 
     # hardened soe image
     $UPLF_SSU_RESOURCE_NAME = $null,
@@ -76,6 +76,7 @@ param(
     # vagrant auth token to Vagrant Cloud
     $VAGRANT_CLOUD_AUTH_TOKEN = $null,
     $VAGRANT_CLOUD_BOX_VERSION = $null,
+    $VAGRANT_CLOUD_RELEASE = $null,
 
     # https://www.packer.io/docs/other/environment-variables.html
     $PACKER_CACHE_DIR = $null,
@@ -87,31 +88,86 @@ param(
     $PACKER_PLUGIN_MIN_PORT = $null,
 
     # QA params
-    $QA_FIX = $null
+    $QA_FIX = $null,
+
+    # No AppInsight flag
+    $UPLF_NO_APPINSIGHT = $null,
+
+    # box export options
+    $UPLF_EXPORT_BOX_PREFIX = 'uplift-local',
+    $UPLF_EXPORT_BOX_PATH   = 'build-export-boxes'
 )
 
 $dirPath = $BuildRoot
 # $scriptPath = $MyInvocation.MyCommand.Name
 
 . "$dirPath/.build-helpers.ps1"
+. "$dirPath/.build-appinsights.ps1"
+
+Confirm-UpliftUpliftAppInsightClient
 
 # Build Scripts Guidelines
 # https://github.com/nightroman/Invoke-Build/wiki/Build-Scripts-Guidelines
 
-$container = New-PackerBuildContainer $packerImageName
+$container = $null;
+
+function Get-AppInsightProperties($container) {
+    if($container -eq $null) {
+        reutrn $null   
+    }
+
+    $hash = @{
+        "BuildTask" = $script:BuildTask
+        "PackerImageName" = $container.PackerImageName
+        "BuildId" = $container.BuildId.ToString()
+        "Elapsed" = $script:Stopwatch.ElapsedMilliseconds.ToString()
+        "GitBranchName" = $container.GitBranchName.ToString()
+        "GitBranchCommit" = $container.GitBranchCommit.ToString()
+    }
+
+    # current build status
+    $hash.Add("Success", ($ERROR.Count -eq 0) )
+
+    # build host
+    $buildAgent = "uplift-packer"
+    if($null -ne $env:JENKINS_HOME) {
+       $buildAgent = "uplift-jenkins"
+    } 
+
+    $hash.Add("BuildAgent", $buildAgent)
+
+    return $hash
+}
+
+function Get-AppInsightMetrics($container) {
+    return $null
+}
 
 Enter-Build {
 
     Update-EnvVariables
 
-    Write-Build Green "Build container:"
-    Write-Build Green ($container | ConvertTo-JSON)
+    $script:Stopwatch = [Diagnostics.Stopwatch]::StartNew()
+
+    $httpServerSession = New-UpliftHttpServerSession $packerImageName
+    $container = New-PackerBuildContainer $packerImageName $httpServerSession
+
+    New-UpliftTrackEvent "packer.build.start" `
+        (Get-AppInsightProperties $container) `
+        (Get-AppInsightMetrics $container)
+
+    Write-BuildInfoMessage "Build container:"
+    $buildContainerJson = ($container | ConvertTo-JSON)
+    Write-BuildDebugMessage $buildContainerJson
+
+    # saving current build container metadata
+    $buildContainerJson | Out-File ($container.BuildDir + "/.build-container.json") -Force
 
     $gitBranch =  Get-GitBranchName $UPLF_GIT_BRANCH
     $gitCommit =  Get-GitCommit     $UPLF_GIT_COMMIT
 
-    Write-Build Green " - branch: $gitBranch"
-    Write-Build Green " - commit: $gitCommit"
+    Write-BuildInfoMessage " - branch: $gitBranch"
+    Write-BuildInfoMessage " - commit: $gitCommit"
 
     # ensure packer plugin
     $packerPlugingPath = '';
@@ -119,13 +175,15 @@ Enter-Build {
     $packerPluginFileName = ''
     
     if($IsWindows) {
-        $packerPlugingPath = Resolve-Path ( Join-Path -Path $ENV:APPDATA -ChildPath 'packer.d/plugins' )
+        $packerPlugingPath = Join-Path -Path $ENV:APPDATA -ChildPath 'packer.d/plugins'
+        [System.IO.Directory]::CreateDirectory($packerPlugingPath) | Out-Null    
 
         $packerPluginUrl      = 'https://github.com/themalkolm/packer-builder-vagrant/releases/download/v2018.10.15/packer-1.2.5_packer-builder-vagrant_windows_amd64.exe'
         $packerPluginFileName = 'packer-builder-vagrant.exe'
 
     } elseif($IsMacOS -eq $True) {
         $packerPlugingPath = Resolve-Path "~/.packer.d/plugins"
+        [System.IO.Directory]::CreateDirectory($packerPlugingPath) | Out-Null    
 
         $packerPluginUrl   = 'https://github.com/themalkolm/packer-builder-vagrant/releases/download/v2018.10.15/packer-1.2.5_packer-builder-vagrant_darwin_amd64'
         $packerPluginFileName = 'packer-builder-vagrant'
@@ -134,16 +192,15 @@ Enter-Build {
     $packerPlugingFilePath = Join-Path -Path $packerPlugingPath -ChildPath $packerPluginFileName 
 
     if( (Test-Path $packerPlugingFilePath) -eq $False) {
-        Write-Build Yellow "[~] downloading packer plugin for the first time only"
-        Write-Build Yellow " - src: $packerPluginUrl"
-        Write-Build Yellow " - dst: $packerPlugingFilePath"
+        Write-BuildWarningMessage "[~] downloading packer plugin for the first time only"
+        Write-BuildWarningMessage " - src: $packerPluginUrl"
+        Write-BuildWarningMessage " - dst: $packerPlugingFilePath"
        
         Invoke-WebRequest -Uri $packerPluginUrl `
                         -OutFile $packerPlugingFilePath 
-
         
     } else {
-        Write-Build Green "[+] packer plugin exists: $packerPluginFileName"
+        Write-BuildInfoMessage "[+] packer plugin exists: $packerPluginFileName"
     }
 
     if( ($IsWindows -eq $True) ) {
@@ -162,27 +219,47 @@ Enter-Build {
     }
 
     if($null -ne $UPLF_VBMANAGE_MACHINEFOLDER) {
-        Write-Build Yellow "[!] setting custom vboxmanage machine folder: $UPLF_VBMANAGE_MACHINEFOLDER"
+        Write-BuildWarningMessage "[!] setting custom vboxmanage machine folder: $UPLF_VBMANAGE_MACHINEFOLDER"
         pwsh -c "vboxmanage setproperty machinefolder $UPLF_VBMANAGE_MACHINEFOLDER"
     }
 
 }
 
 Exit-Build {
-    if($null -ne $UPLF_VBMANAGE_MACHINEFOLDER) {
-        Write-Build Yellow "[!] reverting vboxmanage machine folder to default"
-        pwsh -c 'vboxmanage setproperty machinefolder default'
+    
+    $err = $null
+    
+    try {
+        if($null -ne $UPLF_VBMANAGE_MACHINEFOLDER) {
+            Write-BuildWarningMessage "[!] reverting vboxmanage machine folder to default"
+            pwsh -c 'vboxmanage setproperty machinefolder default'
+        }
+    }
+    catch {
+        $err = $_
+    }
+    finally {
+        New-UpliftTrackEvent "packer.build.finish" `
+            (Get-AppInsightProperties $container) `
+            (Get-AppInsightMetrics $container)
+
+        if($null -ne $err) {
+            New-UpliftTrackException $err.Exception `
+                (Get-AppInsightProperties $container) `
+                (Get-AppInsightMetrics $container)
+        }
     }
 }
 
 task Checkout {
+
     $isGit = git rev-parse --is-inside-work-tree
 
     if ($isGit -eq "true") {
-        Write-Build Green " [~] pulling latest from git"
+        Write-BuildInfoMessage " [~] showing git branch info"
 
         exec {
-            git pull
+            # git pull
             git status
 
             git remote get-url origin
@@ -191,18 +268,18 @@ task Checkout {
         }
     }
     else {
-        Write-Build Green " [+] skipping git pull"
+        Write-BuildInfoMessage " [+] skipping showing git branch info"
     }
 }
 
 # Synopsis: Shows tools and versions
 task ShowBuildTools {
     exec {
-        Write-Build Green " [+] packer"
+        Write-BuildInfoMessage " [+] packer"
         Set-PackerEnvVariables
         packer version
 
-        Write-Build Green " [+] vagrant"
+        Write-BuildInfoMessage " [+] vagrant"
         Set-VagrantEnvVariables
         vagrant version
     }
@@ -211,7 +288,7 @@ task ShowBuildTools {
 # Synopsis: Validates packer image
 task PackerValidate {
     exec {
-        Write-Build Green " [~] validating packer config"
+        Write-BuildInfoMessage " [~] validating packer config"
 
         packer validate `
             -var-file="$($container.VariablesFile)" `
@@ -221,7 +298,7 @@ task PackerValidate {
 
 task PackerInspect {
     exec {
-        Write-Build Green " [~] inspecting packer config"
+        Write-BuildInfoMessage " [~] inspecting packer config"
 
         packer inspect `
             "$($container.PackerFile)"
@@ -229,7 +306,7 @@ task PackerInspect {
 }
 
 # Synopsis: Builds packer image
-task PackerBuild {
+task PackerBuildNoForce {
     Invoke-PackerBuild $false
 }
 
@@ -251,11 +328,9 @@ task VagrantBoxAddForce {
 # Synopsis: Tests newly created vagrant box
 task VagrantBoxTest {
     #exec {
-        Write-Build Green "Testing vagrant box, file: $($container.VagrantTestFile)"
+        Write-BuildInfoMessage "Testing vagrant box, file: $($container.VagrantTestFile)"
 
         try {
-            $ENV:UPLF_VAGRANT_LINKED_CLONE = 1
-
             Copy-Item $container.VagrantTestFile `
                 -Destination "$($container.PackerBuildDir)/" `
                 -Force
@@ -274,15 +349,14 @@ task VagrantBoxTest {
                 -Force -Recurse
             }
             
-            $vagrantCwd =  [String]( Resolve-Path $container.PackerBuildDir)
-            #$ENV:VAGRANT_CWD = $vagrantCwd
-
-            Write-Build Green "Using vagrantfile cwd: $vagrantCwd"
+            $vagrantCwd = [String]( Resolve-Path $container.PackerBuildDir)
+            
+            Write-BuildInfoMessage "Using vagrantfile cwd: $vagrantCwd"
 
             $vagrantBoxName = ($container.VagrantBoxName)
             $ENV:UPLF_VAGRANT_BOX_NAME = $vagrantBoxName
 
-            Write-Build Green "Using vagrant box: $vagrantBoxName"
+            Write-BuildInfoMessage "Using vagrant box: $vagrantBoxName"
          
             if ($null -ne $UPLF_VBMANAGE_MACHINEFOLDER) {
                 $ENV:UPLF_VBMANAGE_MACHINEFOLDER = $UPLF_VBMANAGE_MACHINEFOLDER
@@ -290,34 +364,32 @@ task VagrantBoxTest {
 
             Set-VagrantEnvVariables
 
-            Write-Build Blue "Running: vagrant validate"
+            Write-BuildInfoMessage "Running: vagrant validate"
             pwsh -c "cd $vagrantCwd; vagrant validate"
             Confirm-ExitCode $LASTEXITCODE "Failed: vagrant validate"
 
-            Write-Build Blue "Running: vagrant status"
+            Write-BuildInfoMessage "Running: vagrant status"
             pwsh -c "cd $vagrantCwd; vagrant status"
 
-            Write-Build Blue "Running: vagrant clean up script"
+            Write-BuildInfoMessage "Running: vagrant clean up script"
             pwsh -c "cd $vagrantCwd; . ./.vagrant-cleanup.ps1"
             Confirm-ExitCode $LASTEXITCODE "Failed: vagrant clean up script"
         
             # test
-            Write-Build Blue "Running: vagrant-test.ps1"
+            Write-BuildInfoMessage "Running: vagrant-test.ps1"
             pwsh -c "cd $vagrantCwd; . ./.vagrant-test.ps1"
+            Confirm-ExitCode $LASTEXITCODE "Failed: vagrant-test.ps1"
 
             # survived!
-            Write-Build Yellow "[+] PASSED ALL VAGRANT TESTS! This box looks really cool!"
+            Write-BuildWarningMessage "[+] PASSED ALL VAGRANT TESTS! This box looks really cool!"
         }
         catch {
-            Write-Build Red "ERR: $_"
-
+            Write-BuildErrorMessage "ERR: $_"
             throw "Failed vagrant testing: $_"
         }
         finally {
-            Write-Build Blue "Running final clean up"
-            
+            Write-BuildInfoMessage "Running: final vagrant clean up script"
             pwsh -c "cd $vagrantCwd; . ./.vagrant-cleanup.ps1"
-            pwsh -c "cd $vagrantCwd; vagrant halt"
         }
     #}
 }
@@ -330,7 +402,7 @@ task DeleteLinkedCloneVMs {
 # Synopsis: Cleans up test Vagrant VMs
 task VagrantBoxTestCleanup ?VagrantBoxTest, {
     exec {
-        Write-Build Green "Cleaning up vagrant test VMs, file: $($container.VagrantTestFile)"
+        Write-BuildInfoMessage "Cleaning up vagrant test VMs, file: $($container.VagrantTestFile)"
 
         exec {
             $ENV:VAGRANT_VAGRANTFILE = $container.VagrantTestFile
@@ -338,15 +410,79 @@ task VagrantBoxTestCleanup ?VagrantBoxTest, {
 
             Set-VagrantEnvVariables
 
-            Write-Build Green "vagrant destroy -f"
+            Write-BuildInfoMessage "vagrant destroy -f"
             vagrant destroy -f
+        }
+    }
+}
+
+function Get-BoxMetadataContent() {
+    $branch = $script:UPLF_GIT_BRANCH
+    $commit = $script:UPLF_GIT_COMMIT
+
+    $projectGitHubUrl = "https://github.com/SubPointSolutions/uplift-packer";
+    
+    $projectGitHubBranchUrl = "$projectGitHubUrl/tree/$branch"
+    $projectGitHubCommitUrl = "$projectGitHubUrl/commit/$commit"
+
+    $content = [String]::Join(' | ', @(
+        "<a href='https://github.com/SubPointSolutions/uplift-packer'>GitHub</a>",
+        "Branch: <a href='$projectGitHubBranchUrl'>$branch</a>",
+        "Commit: <a href='$projectGitHubCommitUrl'>$commit</a>"
+    ) )
+
+    return $content
+}
+
+# Synopsis: Exports Vagrant boxes to the giving location
+task VagrantExportBoxes {
+
+    $boxPrefix = $UPLF_EXPORT_BOX_PREFIX
+    $boxPath   = Join-Path $UPLF_EXPORT_BOX_PATH "$($container.GitBranchName)/$($container.GitBranchCommit)"
+
+    Write-BuildInfoMessage "[~] Exporting vagrant boxes"
+    Write-BuildInfoMessage " - prefix : $boxPrefix"
+    Write-BuildInfoMessage " - path   : $boxPath"
+
+    [System.IO.Directory]::CreateDirectory($boxPath) | Out-Null 
+
+    exec {
+        Set-VagrantEnvVariables
+
+        $vagrantBoxOutput = [String]((vagrant box list) |  Out-String)
+        $vagrantBoxLines  = $vagrantBoxOutput.Split([Environment]::NewLine)
+        
+        foreach($vagrantBoxLine in $vagrantBoxLines) {
+            $boxName = $vagrantBoxLine.Split(' ')[0].Trim()
+            
+
+            if($boxName.Contains($boxPrefix) -eq $True) {
+                $boxFileName = ($boxName.Replace('/','-').Replace('\','-') + ".box")
+
+                Write-BuildInfoMessage " exporting box: $boxName as $boxFileName"
+                Write-BuildInfoMessage "Running: vagrant box repackage $boxName"
+                
+                if( (Test-Path "$boxPath/package.box") -eq $True) {
+                    Remove-Item "$boxPath/package.box" -Force 
+                }
+
+                pwsh -c "cd $boxPath; vagrant box repackage $boxName virtualbox 0"
+
+                if( (Test-Path "$boxPath/$boxFileName") -eq $True) {
+                    Remove-Item "$boxPath/$boxFileName" -Force 
+                }
+
+                Rename-Item -Path "$boxPath/package.box" -NewName $boxFileName -Force
+
+                Confirm-ExitCode $LASTEXITCODE "Failed: vagrant box repackage"
+            }
         }
     }
 }
 
 # Synopsis: Publishes Vagrant box to Vagrant Cloud
 task VagrantCloudPublish {
-    Write-Build Green "[~] Publishing vagtant box to Vagrant Cloud: $($container.VagrantBoxName)"
+    Write-BuildInfoMessage "[~] Publishing vagtant box to Vagrant Cloud: $($container.VagrantBoxName)"
 
     $VAGRANT_CLOUD_AUTH_TOKEN = Get-VariableOrEnvVariable "VAGRANT_CLOUD_AUTH_TOKEN" `
         $VAGRANT_CLOUD_AUTH_TOKEN `
@@ -356,84 +492,123 @@ task VagrantCloudPublish {
 
         Set-VagrantEnvVariables
 
-        Write-Build Green "[~] auth with Vagrant Cloud..."
+        Write-BuildInfoMessage "[~] auth with Vagrant Cloud..."
 
-        # $dateStamp = Get-Date -f "yyyyMMdd"
-        # $timeStamp = Get-Date -f "HHmmss"
+        $year  = [System.DateTime]::UtcNow.ToString("yy")
+        $month = [System.DateTime]::UtcNow.ToString("MM")
 
-        $year = Get-Date -f "yy"
-        $month = Get-Date -f "MM"
-
-        $day = Get-Date -f "dd"
-        $minSec = Get-Date -f "HHmm"
-
+        $day    = [System.DateTime]::UtcNow.ToString("dd")
+        $minSec = [System.DateTime]::UtcNow.ToString("HHmm")
+        
         # $stamp = "$dateStamp.$timeStamp"
         $boxVersion = "$year$month.$day.$minSec"
 
         if($null -ne $VAGRANT_CLOUD_BOX_VERSION) {     
             $boxVersion = $VAGRANT_CLOUD_BOX_VERSION
-            Write-Build Yellow "[!] using VAGRANT_CLOUD_BOX_VERSION box version: $boxVersion"
+            Write-BuildWarningMessage "[!] using VAGRANT_CLOUD_BOX_VERSION box version: $boxVersion"
         }
 
-        Write-Build Green "[~] box version: $boxVersion"
+        Write-BuildInfoMessage "[~] box version: $boxVersion"
 
         $publishBoxName = "subpointsolutions/$($container.VagrantPublishingBoxName)"
         $publishBoxVersion = $boxVersion
 
-        $publishBoxSrcPath = $container.VagrantBoxFile
+        # used to have .box file within the build folder
+        # takes too much space - local box file in the build folder, and then another under the vagrant home path
+
+        # publishing now exports vagrant box into a temporary box file
+        # then pushes to vagrant cloud
+        # then deletes temporary box from the local folder
+        Set-VagrantEnvVariables
+
+        $boxPublishingFolder = ($container.PackerBuildDir + "/box-publishing")
+        [System.IO.Directory]::CreateDirectory($boxPublishingFolder) | Out-Null 
+
+        Write-BuildInfoMessage "Running: vagrant box repackage"
+        pwsh -c "cd $boxPublishingFolder; vagrant box repackage $($container.VagrantBoxName) virtualbox 0"
+        Confirm-ExitCode $LASTEXITCODE "Failed: vagrant box repackage"
+
+        $publishBoxSrcPath = ($boxPublishingFolder + "/package.box")
 
         $publishBoxDescription = "This is a regression box to ensure CI/CD pipeline for Packer/Vagrant"
-        $publishBoxShortDescription = "CI/CD regression for box $publishBoxName"
-
-        $publishBoxVersionDescription = "CI/CD regression for box $publishBoxName, v$publishBoxVersion"
-        $publishBoxVersionDescription += " branch: $($script:UPLF_GIT_BRANCH) commit: $($script:UPLF_GIT_COMMIT)"
-
+        $publishBoxShortDescription = "Automated build by the uplift projct: box $publishBoxName"
+        
         if( (Test-Path $container.PackerBuildReleaseNotesFile) -eq $True  ) {
 
-            Write-Build Green "[+] using release notes filet: $($container.PackerBuildReleaseNotesFile)"
+            Write-BuildInfoMessage "[+] using release notes file: $($container.PackerBuildReleaseNotesFile)"
 
             $publishBoxVersionDescription += [Environment]::NewLine
             $publishBoxVersionDescription += [Environment]::NewLine
 
             $publishBoxVersionDescription += Get-Content -Raw $container.PackerBuildReleaseNotesFile
         } else {
-            Write-Build Yellow "[!!!] Release notes file does not exist: $($container.PackerBuildReleaseNotesFile)"
+            Write-BuildWarningMessage "[!!!] Release notes file does not exist: $($container.PackerBuildReleaseNotesFile)"
+
+            $publishBoxVersionDescription += Get-BoxMetadataContent
         }
 
-        Write-Build Yellow "[!!!] Publishing box to Vagrant Cloud [!!!]"
-        Write-Build Green " - box version: $publishBoxVersion"
-        Write-Build Green ""
-        Write-Build Green " - box name   : $publishBoxName"
-        Write-Build Green " - box src    : $publishBoxSrcPath"
-        Write-Build Green ""
-        Write-Build Green " - short desc : $publishBoxDescription"
-        Write-Build Green " - long  desc : $publishBoxShortDescription"
-        Write-Build Green " - vers  desc : $publishBoxVersionDescription"
+        $shouldRelease = ($null -ne $VAGRANT_CLOUD_RELEASE)
+
+        Write-BuildWarningMessage "[!!!] Publishing box to Vagrant Cloud [!!!]"
+        Write-BuildWarningMessage " - shouldRelease: $shouldRelease"
+        
+
+        Write-BuildInfoMessage " - box version: $publishBoxVersion"
+        Write-BuildInfoMessage ""
+        Write-BuildInfoMessage " - box name   : $publishBoxName"
+        Write-BuildInfoMessage " - box src    : $publishBoxSrcPath"
+        Write-BuildInfoMessage ""
+        Write-BuildInfoMessage " - short   desc : $publishBoxDescription"
+        Write-BuildInfoMessage " - long    desc : $publishBoxShortDescription"
+        Write-BuildInfoMessage " - version desc : $publishBoxVersionDescription"
 
         try {
-            Write-Build Green "[~] vagrant cloud auth login"
+
+            Write-BuildInfoMessage "[~] vagrant cloud auth login"
             vagrant cloud auth login -t "$VAGRANT_CLOUD_AUTH_TOKEN"
             Confirm-ExitCode $LASTEXITCODE "[~] failed!"
 
-            Write-Build Green "[+] OK!"
+            Write-BuildInfoMessage "[+] OK!"
 
-            Write-Build Green "[~] vagrant cloud publish..."
-            vagrant cloud publish `
-                $publishBoxName `
-                $publishBoxVersion `
-                virtualbox `
-                $publishBoxSrcPath `
-                --description "$publishBoxDescription" `
-                --short-description "$publishBoxShortDescription" `
-                --version-description "$publishBoxVersionDescription" `
-                --force
+            if($shouldRelease -eq $True) {
+                Write-BuildInfoMessage "[~] [!RELEASE!] vagrant cloud publish..."
+
+                vagrant cloud publish `
+                    $publishBoxName `
+                    $publishBoxVersion `
+                    virtualbox `
+                    $publishBoxSrcPath `
+                    --description "$publishBoxDescription" `
+                    --short-description "$publishBoxShortDescription" `
+                    --version-description "$publishBoxVersionDescription" `
+                    --force `
+                    --release
+            } else {
+                Write-BuildInfoMessage "[~] [NO-RELEASE] vagrant cloud publish..."
+
+                vagrant cloud publish `
+                    $publishBoxName `
+                    $publishBoxVersion `
+                    virtualbox `
+                    $publishBoxSrcPath `
+                    --description "$publishBoxDescription" `
+                    --short-description "$publishBoxShortDescription" `
+                    --version-description "$publishBoxVersionDescription" `
+                    --force
+            }
+
             Confirm-ExitCode $LASTEXITCODE "[~] failed!"
 
-            Write-Build Green "[+] OK!"
+            Write-BuildInfoMessage "[+] OK!"
+
         } catch {
-            Write-Build Green "[~] vagrant cloud auth login --logout"
-            vagrant cloud auth login --logout
             throw
+        } finally {
+            Write-BuildInfoMessage "[~] vagrant cloud auth login --logout"
+            vagrant cloud auth login --logout
+            
+            Write-BuildInfoMessage "[~] deleting temporary box:  $publishBoxSrcPath"
+            Remove-Item  $publishBoxSrcPath -Force -ErrorAction SilentlyContinue
         }
     }
 }
@@ -456,20 +631,20 @@ task AnalyzeModule {
                 $filePath = $filePathContainer.FullName
                 
                 if($filePath.Contains(".dsc.ps1") -eq $True -and $IsMacOS) {
-                    Write-Build Yellow " - skipping DSC validation under macOS"
+                    Write-BuildWarningMessage " - skipping DSC validation under macOS"
 
-                    Write-Build Green " - file   : $filePath"
-                    Write-Build Green " - QA_FIX : $QA_FIX"
+                    Write-BuildInfoMessage " - file   : $filePath"
+                    Write-BuildInfoMessage " - QA_FIX : $QA_FIX"
 
-                    Write-Build Green  " - https://github.com/PowerShell/PowerShell/issues/5707"
-                    Write-Build Green  " - https://github.com/PowerShell/PowerShell/issues/5970"
-                    Write-Build Green  " - https://github.com/PowerShell/MMI/issues/33"
+                    Write-BuildInfoMessage  " - https://github.com/PowerShell/PowerShell/issues/5707"
+                    Write-BuildInfoMessage  " - https://github.com/PowerShell/PowerShell/issues/5970"
+                    Write-BuildInfoMessage  " - https://github.com/PowerShell/MMI/issues/33"
 
                     continue;
                 }
               
-                Write-Build Green " - file   : $filePath"
-                Write-Build Green " - QA_FIX : $QA_FIX"
+                Write-BuildInfoMessage " - file   : $filePath"
+                Write-BuildInfoMessage " - QA_FIX : $QA_FIX"
 
                 if($psFilesCount -eq 0) {
                     continue;
@@ -489,54 +664,45 @@ task AnalyzeModule {
 task CreateReleaseNotes {
     $boxSpecFile = Join-Path -Path $container.PackerBuildDir -ChildPath "box-spec/box-spec.json"
 
-    Write-Build Green "Box spec file: $boxSpecFile"
-
-    if( (Test-Path $boxSpecFile ) -eq $False ) {
-        Write-Build Yellow "[~] box spec file does not exist. Won't create automated release notes"
-
-        return
-    }
-    
-    $metadata = Get-Content -Raw -Path $boxSpecFile | ConvertFrom-Json
+    Write-BuildInfoMessage "Box spec file: $boxSpecFile"
     $markDownTemplates = Get-Content -Raw -Path $container.VagrantReleaseFile
 
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_NAME$', 
-        $metadata.Win32_OperatingSystem.Caption
-    )
+    if( (Test-Path $boxSpecFile ) -eq $False ) {
+        Write-BuildWarningMessage "[~] box spec file does not exist. Won't create templated release notes"
 
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_VERSION$', 
-        $metadata.Win32_OperatingSystem.Version
-    )
+        $contentTokens = @{
+            '$BOX_METADATA$'  =  Get-BoxMetadataContent
+        }
 
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_PATCHES$', 
-        (Get-GetHotFixMarkdownTable  $metadata.Get_HotFix)
-    )
+        foreach ($token in $contentTokens.Keys) {
+            $value =  $contentTokens[$token]
+            $markDownTemplates = $markDownTemplates.Replace($token, $value)
+        }
+    } else {
+        Write-BuildWarningMessage "[~] box spec file exist. Creating templated release notes"
+    
+        $metadata = Get-Content -Raw -Path $boxSpecFile | ConvertFrom-Json
+        
+        $contentTokens = @{
+            '$OS_NAME$'       = $metadata.Win32_OperatingSystem.Caption
+            '$OS_VERSION$'    = $metadata.Win32_OperatingSystem.Version
+            '$OS_PATCHES$'    = (Get-GetHotFixMarkdownTable  $metadata.Get_HotFix)
+            '$OS_PS_MODULES$' = (Get-PSModulesMarkdownTable  $metadata.Get_InstalledModule)
+            '$OS_PACKAGES$'   = (Get-Win32_ProductMarkdownTable  $metadata.Win32_Product)
+            '$OS_FEATURES$'   = (Get-Get_WindowsFeatureMarkdownTable  $metadata.Get_WindowsFeature)
+            '$BOX_METADATA$'  =  Get-BoxMetadataContent
 
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_PS_MODULES$', 
-        (Get-PSModulesMarkdownTable  $metadata.Get_InstalledModule)
-    )
+            '$OS_CHOCOLATEY_PACKAGES$'  = (Get-Choco_PackagesMarkdownTable  $metadata.Choco_Packages)
+        }
 
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_PACKAGES$', 
-        (Get-Win32_ProductMarkdownTable  $metadata.Win32_Product)
-    )
-
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_FEATURES$', 
-        (Get-Get_WindowsFeatureMarkdownTable  $metadata.Get_WindowsFeature)
-    )
-
-    $markDownTemplates = $markDownTemplates.Replace(
-        '$OS_CHOCOLATEY_PACKAGES$', 
-        (Get-Choco_PackagesMarkdownTable  $metadata.Choco_Packages)
-    )
+        foreach ($token in $contentTokens.Keys) {
+            $value =  $contentTokens[$token]
+            $markDownTemplates = $markDownTemplates.Replace($token, $value)
+        }
+    }
 
     $markDownTemplates `
-        | Out-File -FilePath $container.PackerBuildReleaseNotesFile -Force
+            | Out-File -FilePath $container.PackerBuildReleaseNotesFile -Force
 }
 
 task Clean {
@@ -546,13 +712,16 @@ task Clean {
 task QA AnalyzeModule
 
 # Synopsis: Builds packer image
-task . Checkout,
+task . PackerBuild
+
+# Synopsis: Rebuilds packer image
+task PackerBuild Checkout,
     Clean,
     ShowBuildTools,
     PackerValidate,
     PackerInspect,
-    PackerBuild,
-    VagrantBoxAdd,
+    PackerBuildNoForce,
+    VagrantBoxAddForce,
     CreateReleaseNotes
 
 # Synopsis: Rebuilds packer image

@@ -22,6 +22,7 @@ $hardenedVariables       = Get-JSON "$packerTemplatesPath/win-2016-datacenter-ha
 $hardenedProvisioners    = Get-JSON "$packerTemplatesPath/win-2016-datacenter-hardened/provisioners.json"
 
 $specExtractor     = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-box-spec-extractor.json"
+$optimizeUplift    = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-optimize.json"
 
 $template = @{
     "builders"        = $coreBuilder.builders
@@ -37,7 +38,8 @@ $template = @{
                             $coreVirtualboxAddition.provisioners `
                             $soeProvisioners.provisioners `
                             $hardenedProvisioners.provisioners `
-                            $specExtractor.provisioners
+                            $specExtractor.provisioners `
+                            $optimizeUplift.provisioners
 
     "post-processors" = $corePostProcessor.'post-processors'
 }

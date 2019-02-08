@@ -1,1 +1,1 @@
-vagrant destroy sp16-dev -f
+vagrant destroy -f

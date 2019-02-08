@@ -12,7 +12,7 @@
 
         "uplf_bin_repo_http_addr": "10.0.2.2:9091",
 
-        "uplf_vboxmanage_cpuexecutioncap": "80",
+        "uplf_vboxmanage_cpuexecutioncap": "100",
         "uplf_vboxmanage_cpus": "4",
         "uplf_vboxmanage_memory": "4096"
     }

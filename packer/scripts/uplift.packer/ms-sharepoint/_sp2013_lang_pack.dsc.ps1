@@ -66,7 +66,7 @@ foreach($langPackResourceName in $langPackResourceNames) {
 Configuration SharePoint_LangPacks
 {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName SharePointDsc
+    Import-DscResource -ModuleName SharePointDsc -ModuleVersion "1.9.0.0"
 
     node "localhost"
     {

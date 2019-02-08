@@ -85,7 +85,7 @@
         {
             "type": "file",
             "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
-            "destination": "c:/Windows/Temp/_uplift_winrm.ps1"
+            "destination": "{{user `uplf_winrm_task_file_path` }}"
         },
 
         {

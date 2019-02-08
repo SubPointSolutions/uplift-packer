@@ -8,8 +8,8 @@ Write-UpliftEnv
 
 Configuration Configure_AppSOE {
 
-    Import-DscResource -ModuleName xActiveDirectory
-    Import-DscResource -ModuleName xNetworking
+    Import-DscResource -ModuleName xActiveDirectory -ModuleVersion 2.17.0.0
+    Import-DscResource -ModuleName xNetworking -ModuleVersion 5.5.0.0
 
     Node localhost
     {

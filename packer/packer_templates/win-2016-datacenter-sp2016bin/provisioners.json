@@ -10,6 +10,49 @@
         {
             "type": "powershell",
             "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_packages.dsc.ps1"
+            ],
+            "environment_vars": [
+                
+            ]
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_config.dsc.ps1"
+            ],
+            "environment_vars": [
+                
+            ]
+        },
+
+        {
+            "type": "windows-restart"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_config.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_DSC_CHECK=1"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
                 "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
             ],
             "environment_vars": [

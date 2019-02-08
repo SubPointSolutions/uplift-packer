@@ -1,0 +1,61 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_version ">= 2.2.3"
+
+# uplift helper for vagrant configurations
+uplift = VagrantPlugins::Uplift::Config()
+
+uplift.set_network_range("192.168.10")
+uplift.set_config_path("~/.uplift-packer-tests")
+
+box_dc       = ENV['UPLF_VAGRANT_DC_BOX_NAME'] || "uplift-local/win-2016-datacenter-soe-latest-master" 
+linked_clone = ENV['UPLF_VAGRANT_LINKED_CLONE'].nil? == false
+
+uplift.uplift_set_vbmanage_machinefolder('', '', nil)
+
+vm_dc = "dc16-shared"
+
+Vagrant.configure("2") do |config|
+
+  # domain controller box
+  config.vm.define(vm_dc) do | vm_config |      
+
+    vm_config.vm.box = box_dc
+
+    # standard config
+    uplift.uplift_synced_folder(vm_dc, vm_config)
+    uplift.uplift_2Gb(vm_dc, vm_config)
+    uplift.uplift_hostname(vm_dc, vm_config, vm_dc)
+    
+    # always setup correct networking
+    uplift.uplift_private_dc_network(vm_dc, vm_config)
+    
+    # uplift baseline
+    if !uplift.has_checkpoint?(vm_dc, 'dsc-soe') 
+      uplift.uplift_win16_dsc_base(vm_dc, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
+    end
+
+    # uplift dc creation
+    if !uplift.has_checkpoint?(vm_dc, 'dc-creation') 
+      uplift.uplift_dc16(vm_dc, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'dc-creation'
+    end
+
+    # additional virtualbox tweaks
+    vm_config.vm.provider "virtualbox" do |v|
+      v.gui  = false
+     
+      v.cpus   = uplift.get_vm_cpus(vm_dc, 4)
+      v.memory = uplift.get_vm_memory(vm_dc, 2 * 1024)
+
+      v.customize ['modifyvm', :id, '--cpuexecutioncap', '100'] 
+      v.customize ["modifyvm", :id, "--ioapic", "on"]
+
+      v.linked_clone = linked_clone
+    end
+
+  end  
+
+end
