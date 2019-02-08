@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
     uplift.set_hostname(vm_dc, vm_config, vm_dc)
     
     # always setup correct networking
-    uplift.uplift_private_dc_network(vm_dc, vm_config)
+    uplift.set_private_dc_network(vm_dc, vm_config)
     
     # uplift baseline
     if !uplift.has_checkpoint?(vm_dc, 'dsc-soe') 
@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
 
     # uplift dc creation
     if !uplift.has_checkpoint?(vm_dc, 'dc-creation') 
-      uplift.uplift_dc16(vm_dc, vm_config)
+      uplift.provision_dc16(vm_dc, vm_config)
       vm_config.vm.provision :uplift_checkpoint, name: 'dc-creation'
     end
 

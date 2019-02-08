@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 
 Import-Module Uplift.Core
 
-Write-UpliftMessage "[~] Installing SharePoint specific PowerShell modules"
+Write-UpliftMessage "[~] Installing SQL specific PowerShell modules"
 Write-UpliftEnv
 
 $packages = @(
