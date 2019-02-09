@@ -151,6 +151,7 @@ function Get-AppInsightMetrics($container) {
 
 Enter-Build {
 
+    Confirm-AppveyorTools
     Update-EnvVariables
 
     $script:Stopwatch = [Diagnostics.Stopwatch]::StartNew()
@@ -756,3 +757,15 @@ task PackerRegress Checkout,
 
 # Synopsis: Rebuilds, regresses, and published packer image to Vagrant Cloud
 task PackerRegressVagrantCloudPublish PackerRegress, VagrantCloudPublish
+
+# Synopsis: Executes Appveyor specific setup
+task AppveyorPrepare {
+    Confirm-AppveyorTools
+}
+
+# Synopsis: Executes Appveyor build
+task Appveyor Checkout, 
+    Clean,
+    ShowBuildTools,
+    PackerValidate,
+    PackerInspect

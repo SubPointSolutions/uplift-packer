@@ -3,6 +3,13 @@ This repository contains Packer templates and build workflows designed for Share
 
 The uplift project offers consistent Packer/Vagrant workflows and Vagrant boxes specifically designed for SharePoint professionals. It heavy lifts low-level details of the creation of domain controllers, SQL servers, SharePoint farms and Visual Studio installs by providing a codified workflow using Packer/Vagrant tooling.
 
+## Build status
+| Branch  | Status | 
+| ------------- | ------------- |  
+| master| [![Build status](https://ci.appveyor.com/api/projects/status/5bewn27ga9s3tq94/branch/master?svg=true)](https://ci.appveyor.com/project/SubPointSupport/uplift-packer/branch/master) |  
+| beta  | [![Build status](https://ci.appveyor.com/api/projects/status/5bewn27ga9s3tq94/branch/beta?svg=true)](https://ci.appveyor.com/project/SubPointSupport/uplift-packer/branch/beta) |  
+| dev   | [![Build status](https://ci.appveyor.com/api/projects/status/5bewn27ga9s3tq94/branch/dev?svg=true)](https://ci.appveyor.com/project/SubPointSupport/uplift-packer/branch/dev) |  
+
 ## How this works
 The uplift project is split into several repositories to address particular a piece of functionality:
 
