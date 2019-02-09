@@ -1,0 +1,14 @@
+test: off
+
+build_script: 
+  - ps: pwsh -c Install-Module -Name InvokeBuild -Force
+  
+  # tooling
+  - ps: choco install -y packer --acceptlicense --no-progress; refreshenv; $host.SetShouldExit(0);
+  - ps: choco install -y vagrant --acceptlicense --no-progress; refreshenv; $host.SetShouldExit(0); 
+
+  # invoke default top-level build
+  - ps: $env:PATH += ";C:\HashiCorp\Vagrant\bin"; pwsh -c Invoke-Build Appveyor
+
+  # build and validate packer templates
+  - ps: $env:PATH += ";C:\HashiCorp\Vagrant\bin"; pwsh -c 'cd packer; pwsh -c invoke-build'
