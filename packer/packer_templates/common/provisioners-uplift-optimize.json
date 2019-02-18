@@ -10,6 +10,9 @@
             "type": "powershell",
             "scripts": [
                 "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_optimize-image.ps1"
+            ], 
+            "environment_vars": [
+                "UPLF_IMAGE_OPTIMIZE_FUNCTIONS={{user `uplf_image_optimize_functions` }}"
             ]
         },
 

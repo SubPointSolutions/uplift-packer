@@ -65,6 +65,18 @@ param(
     $UPLF_UPLIFT_CORE_MODULE_VERSION    = $null,
     $UPLF_UPLIFT_CORE_MODULE_REPOSITORY = $null,
 
+    # comma separated string of functions to be called to optimize the final image
+    # check _optimize-image.ps1 script for more details
+    $UPLF_IMAGE_OPTIMIZE_FUNCTIONS = [String]::Join(',', @(
+        "Optimize-UpliftNetAssemblies"
+        # this one breaks time menu, needs investigation, disabled
+        #"Optimize-UpliftServices"
+        "Optimize-UpliftPowerConfig"
+        "Optimize-UpliftWindowsTemp"
+        "Optimize-UpliftSystemVolume"
+        "Optimize-UpliftZeroSpace"
+    )),
+
     # https://www.vagrantup.com/docs/other/environmental-variables.html
     $VAGRANT_DOTFILE_PATH = $null,
     $VAGRANT_BOX_UPDATE_CHECK_DISABLE = $null,

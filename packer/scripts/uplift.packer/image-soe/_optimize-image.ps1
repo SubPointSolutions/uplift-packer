@@ -43,17 +43,22 @@ function Optimize-UpliftSystemVolume() {
 }   
 
 function Optimize-UpliftServices() {
+
+    # TODO
+    # current implementation breaks start menu tiles
+    # needs more investigation, disabled via ENV variables for the time being
+
     # https://github.com/ops-resource/ops-tools-baseimage/blob/83e17f2ec6a82d593e6f7d9d71dedcd48db56453/src/windows/scripts/Disable-Services.ps1
 
     Write-UpliftMessage "  [~] Optimizing windows services"
 
     $servicesToDisable = @(
-        #'AppReadiness',
+        'AppReadiness',
         'AppXSvc',
         'Diagtrack',
         'DmwApPushService',
         'OneSyncSvc',
-        #'tiledatamodelsvc',
+        'tiledatamodelsvc',
         'ualsvc',
         'XblAuthManager',
         'XblGameSave'
@@ -69,7 +74,7 @@ function Optimize-UpliftServices() {
             Write-UpliftMessage " [+] stopped and disabled: $serviceName"
 
              # Apparently setting the service state in powershell doesn't always stick, so ...
-            $path = "HKLM:\SYSTEM\CurrentControlSet\Services\$($serviceName)"
+            $path = "HKLM:\SYSTEM\CurrentControlSet\Services\$serviceName"
             if (Test-Path $path)
             {
                 Set-ItemProperty -Path $path -Name Start -Value 4 -Force
@@ -85,6 +90,9 @@ function Optimize-UpliftServices() {
 function Optimize-UpliftPowerConfig() {
 
     Write-UpliftMessage "  [~] Optimizing powercfg"
+
+    # High Performance	
+    # https://docs.microsoft.com/en-us/windows/desktop/power/power-policy-settings
     &powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
     
     # Monitor timeout
@@ -145,6 +153,7 @@ function Optimize-UpliftZeroSpace() {
     Write-UpliftMessage "  [+] Wiping empty space on disk completed"
 }
 
+# by default, run all of them
 $optimizers = @(
     "Optimize-UpliftNetAssemblies"
     "Optimize-UpliftServices"
@@ -153,6 +162,15 @@ $optimizers = @(
     "Optimize-UpliftSystemVolume"
     "Optimize-UpliftZeroSpace"
 )
+
+if( ([String]::IsNullOrEmpty($env:UPLF_IMAGE_OPTIMIZE_FUNCTIONS)) -eq $False) {
+    Write-UpliftMessage "[!] using CUSTOM optimizers"
+    $optimizers = ($env:UPLF_IMAGE_OPTIMIZE_FUNCTIONS).Split(",", [System.StringSplitOptions]::RemoveEmptyEntries)
+} else {
+    Write-UpliftMessage "[!] using default optimizers, all of them"
+}
+
+Write-UpliftMessage ([Environment]::NewLine + [String]::Join([Environment]::NewLine , $optimizers))
 
 $optimizersCount = $optimizers.Count
 $index = 1
