@@ -101,18 +101,16 @@ Configuration Configure_UpliftSOE {
             ValueType   = "DWord"
         }
 
-        ScheduledTask UpliftWinRmStartUp
-        {
-            TaskName           = 'UpliftWinRmStartUp'
-            TaskPath           = '\UpliftTasks'
-            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments    = "-File $winrmFile"
-            ScheduleType       = 'AtStartup'
-            RepeatInterval     = '00:15:00'
-            RepetitionDuration = '24:00:00'
-            RunLevel           = 'Highest'
-            Description        = 'Configures WinRM to support vagrant based provision'
-        }
+        # ScheduledTask UpliftWinRmStartUp
+        # {
+        #     TaskName           = 'UpliftWinRmStartUp'
+        #     TaskPath           = '\UpliftTasks'
+        #     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+        #     ActionArguments    = "-File $winrmFile"
+        #     ScheduleType       = 'AtStartup'
+        #     RunLevel           = 'Highest'
+        #     Description        = 'Configures WinRM to support vagrant based provision'
+        # }
 
         xIEEsc Disable_IEEsc
         {

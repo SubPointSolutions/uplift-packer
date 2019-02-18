@@ -82,6 +82,13 @@
         },
 
         {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1"
+            ]
+        },
+
+        {
             "type": "shell-local",
             "command": "echo 'Completed [win-2016-datacenter-soe] provisioners'"
         }
