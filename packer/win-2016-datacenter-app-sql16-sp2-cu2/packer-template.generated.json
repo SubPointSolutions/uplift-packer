@@ -24,7 +24,7 @@
     "uplf_vboxmanage_cpus": "4",
     "uplf_vboxmanage_memory": "4096",
     "uplf_sql_update_resource_names": "ms-sql-server2016-update-sp2-kb4052908",
-    "uplf_sql_cu_resource_name": "ms-sql-server2016-update-cu5-kb4475776",
+    "uplf_sql_cu_resource_name": "ms-sql-server2016-update-cu2-KB4340355",
     "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
     "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82"
   },
