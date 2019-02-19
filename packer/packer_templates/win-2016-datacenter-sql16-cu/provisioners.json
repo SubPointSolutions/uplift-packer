@@ -1,0 +1,50 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [provisioners-uplift-sql16-cu] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+              "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
+            ],
+            "environment_vars": [
+              "UPLF_RESOURCE_NAME={{user `uplf_sql_cu_resource_name`}}",
+              "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+              "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/sql-install-cu.ps1"
+            ],
+            "environment_vars": [
+                "UPLF_DSC_CHECK=1",
+                "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sql_cu_resource_name`}}/latest"                
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "inline": [
+                "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+                "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+            ]
+        },
+
+        {
+            "type": "windows-restart"
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [provisioners-uplift-sql16-cu] provisioners'"
+        }
+    ]
+}

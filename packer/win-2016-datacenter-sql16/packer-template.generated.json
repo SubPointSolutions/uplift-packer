@@ -23,6 +23,10 @@
     "uplf_sql_resource_name": "ms-sql-server2016-rtm",
     "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
     "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82",
+    "uplf_sql_update_resource_names": "",
+    "uplf_sql_features": "SQL,RS",
+    "uplf_sql_instance_id": "MSSQLSERVER",
+    "uplf_sql_skip_installer_run_check": "/SkipInstallerRunCheck",
     "uplf_bin_repo_http_addr": "10.0.2.2:9091",
     "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_vboxmanage_cpus": "4",
@@ -217,17 +221,6 @@
     {
       "type": "powershell",
       "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_RESOURCE_NAME={{user `uplf_sql_studio_resource_name`}}",
-        "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
-        "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/sql-image-packages.ps1"
       ],
       "environment_vars": []
@@ -235,17 +228,14 @@
     {
       "type": "powershell",
       "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/install-sql-studio.dsc.ps1"
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-sql16-update-dist-helper.ps1"
       ],
       "environment_vars": [
-        "UPLF_DSC_CHECK=1",
-        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sql_studio_resource_name`}}/latest",
-        "UPLF_SQL_STUDIO_PRODUCT_ID={{user `uplf_sql_studio_product_id` }}"
+        "UPLF_SQL_BIN_RESOURCE_NAME={{user `uplf_sql_resource_name`}}",
+        "UPLF_SQL_UPDATE_RESOURCE_NAMES={{user `uplf_sql_update_resource_names`}}",
+        "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
+        "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
       ]
-    },
-    {
-      "type": "windows-restart",
-      "restart_timeout": "15m"
     },
     {
       "type": "powershell",
@@ -254,7 +244,10 @@
       ],
       "environment_vars": [
         "UPLF_DSC_CHECK=1",
-        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sql_resource_name`}}/latest"
+        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sql_resource_name`}}/latest",
+        "UPLF_SQL_FEATURES={{user `uplf_sql_features` }}",
+        "UPLF_SQL_INSTANCE_ID={{user `uplf_sql_instance_id` }}",
+        "UPLF_SQL_SKIP_INSTALLER_RUN_CHECK={{user `uplf_sql_skip_installer_run_check` }}"
       ]
     },
     {

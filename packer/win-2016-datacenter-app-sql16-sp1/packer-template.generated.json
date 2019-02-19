@@ -7,34 +7,25 @@
     "uplf_git_commit": "",
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
     "uplf_box_spec_dest_folder": "box-spec",
+    "uplf_disk_size": "100000",
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_compression_level": "6",
     "uplf_image_optimize_functions": "Optimize-UpliftNetAssemblies,Optimize-UpliftPowerConfig,Optimize-UpliftWindowsTemp,Optimize-UpliftSystemVolume,Optimize-UpliftZeroSpace",
-    "uplf_iso_url": "https://download.microsoft.com/download/1/6/F/16FA20E6-4662-482A-920B-1A45CF5AAE3C/14393.0.160715-1616.RS1_RELEASE_SERVER_EVAL_X64FRE_EN-US.ISO",
-    "uplf_iso_checksum": "18a4f00a675b0338f3c7c93c4f131beb",
-    "uplf_iso_checksum_type": "md5",
-    "uplf_disk_size": "100000",
-    "uplf_uplift_core_module_version": "",
-    "uplf_invokeuplift_module_repository": "",
     "uplf_invokeuplift_module_version": "",
+    "uplf_input_box_name": "uplift-local/win-2016-datacenter-app",
+    "uplf_output_directory": "packer_builds/win-2016-datacenter-sql16",
+    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-sql16/win-2016-datacenter-sql16.box",
     "uplf_sql_resource_name": "ms-sql-server2016-rtm",
-    "uplf_sql_update_resource_names": "",
     "uplf_sql_features": "SQL,RS",
     "uplf_sql_instance_id": "MSSQLSERVER",
     "uplf_sql_skip_installer_run_check": "/SkipInstallerRunCheck",
-    "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
-    "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82",
-    "uplf_input_box_name": "uplift-local/win-2016-datacenter-app",
-    "uplf_output_directory": "packer_builds/win-2016-datacenter-vs17",
-    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-vs17/win-2016-datacenter-vs17.box",
-    "uplf_vs17_resource_name": "ms-visualstudio-2017.ent-dist-office-dev",
-    "uplf_vs17_executable_name": "vs_enterprise.exe",
-    "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension;Microsoft.VisualStudio.Workload.Azure",
-    "uplf_vs17_package_count": "400",
     "uplf_bin_repo_http_addr": "10.0.2.2:9091",
     "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_vboxmanage_cpus": "4",
-    "uplf_vboxmanage_memory": "4096"
+    "uplf_vboxmanage_memory": "4096",
+    "uplf_sql_update_resource_names": "ms-sql-server2016-update-sp1-kb3182545",
+    "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
+    "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82"
   },
   "builders": [
     {
@@ -126,86 +117,6 @@
     {
       "type": "shell-local",
       "command": "echo 'Completed [provisioners-uplift-core] provisioners'"
-    },
-    {
-      "type": "shell-local",
-      "command": "echo 'Starting [win-2016-datacenter-soe] provisioners'"
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_UPLIFT_CORE_MODULE_VERSION={{user `uplf_uplift_core_module_version`}}"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/_install-features-win16.ps1"
-      ]
-    },
-    {
-      "type": "windows-restart"
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_bootstrap.ps1"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_packages.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_setup-ps-nuget.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift_resource_module.ps1",
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_install-dsc-modules.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_INVOKE_UPLIFT_MODULE_VERSION={{user `uplf_invokeuplift_module_version`}}",
-        "UPLF_INVOKE_UPLIFT_MODULE_REPOSITORY={{user `uplf_invokeuplift_module_repository`}}"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/tests/ps-modules.Tests.ps1"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
-      ]
-    },
-    {
-      "type": "powershell",
-      "inline": [
-        "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
-        "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
-      ]
-    },
-    {
-      "type": "windows-restart",
-      "restart_timeout": "15m"
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1"
-      ]
-    },
-    {
-      "type": "shell-local",
-      "command": "echo 'Completed [win-2016-datacenter-soe] provisioners'"
     },
     {
       "type": "shell-local",
@@ -357,56 +268,6 @@
     },
     {
       "type": "shell-local",
-      "command": "echo 'Starting [provisioners-uplift-vs17] provisioners'"
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_RESOURCE_NAME={{user `uplf_vs17_resource_name`}}",
-        "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
-        "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-visual-studio/vs17-prepare-script.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_DSC_CHECK=1",
-        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_vs17_resource_name`}}/latest",
-        "UPLF_VS_EXECUTABLE_PATH={{user `uplf_local_repository_path` }}/{{user `uplf_vs17_resource_name`}}/latest/{{user `uplf_vs17_executable_name` }}",
-        "UPLF_VS_PACKAGE_IDS={{user `uplf_vs17_package_ids` }}",
-        "UPLF_VS_PACKAGE_COUNT={{user `uplf_vs17_package_count` }}"
-      ],
-      "valid_exit_codes": [
-        0,
-        3010
-      ]
-    },
-    {
-      "type": "windows-restart",
-      "restart_timeout": "15m"
-    },
-    {
-      "type": "powershell",
-      "inline": [
-        "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
-        "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
-      ]
-    },
-    {
-      "type": "windows-restart"
-    },
-    {
-      "type": "shell-local",
-      "command": "echo 'Completed [provisioners-uplift-vs17] provisioners'"
-    },
-    {
-      "type": "shell-local",
       "command": "echo 'Starting [provisioners-uplift-box-spec-extractor] provisioners'"
     },
     {
@@ -427,6 +288,23 @@
     {
       "type": "shell-local",
       "command": "echo 'Completed [provisioners-uplift-box-spec-extractor] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [provisioners-uplift-optimize] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_optimize-image.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_IMAGE_OPTIMIZE_FUNCTIONS={{user `uplf_image_optimize_functions` }}"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [provisioners-uplift-optimize] provisioners'"
     }
   ],
   "post-processors": [
