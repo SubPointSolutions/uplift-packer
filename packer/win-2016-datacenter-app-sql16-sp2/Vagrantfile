@@ -7,7 +7,7 @@ box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-2016-d
 linked_clone   =  ENV['UPLF_VAGRANT_LINKED_CLONE'].to_s.empty? == false
 machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
 
-vm_client = "app-sql16"
+vm_client = "sql16-sp2"
 
 # uplift helper for vagrant configurations
 uplift = VagrantPlugins::Uplift::Config()
