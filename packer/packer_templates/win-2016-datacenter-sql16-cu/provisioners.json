@@ -17,7 +17,6 @@
               "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
             ]
         },
-
         
         {
             "type": "powershell",
@@ -27,7 +26,9 @@
             "environment_vars": [
                 "UPLF_DSC_CHECK=1",
                 "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sql_cu_resource_name`}}/latest"                
-            ]
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
         },
 
         {

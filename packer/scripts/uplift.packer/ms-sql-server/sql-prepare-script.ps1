@@ -12,7 +12,7 @@ $sqlFeatures      = Get-UpliftEnvVariable "UPLF_SQL_FEATURES" "" "SQL,RS"
 $sqlInstanceId    = Get-UpliftEnvVariable "UPLF_SQL_INSTANCE_ID" "" "MSSQLSERVER"
 $sqlUpdateEnabled = Get-UpliftEnvVariable "UPLF_SQL_UPDATE_ENABLED" "" "False"
 $sqlAction        = Get-UpliftEnvVariable "UPLF_SQL_ACTION" "" "PrepareImage"
-$sqlSkipInstallerRunCheck = Get-UpliftEnvVariable "UPLF_SQL_SKIP_INSTALLER_RUN_CHECK" "" "/SkipInstallerRunCheck"
+$sqlSkipInstallerRunCheck = Get-UpliftEnvVariable "UPLF_SQL_SKIP_INSTALLER_RUN_CHECK" "" ""
 
 try {
     $sqlDir = $sqlInstallDir

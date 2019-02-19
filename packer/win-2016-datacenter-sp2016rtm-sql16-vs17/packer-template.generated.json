@@ -448,7 +448,9 @@
         "UPLF_SQL_FEATURES={{user `uplf_sql_features` }}",
         "UPLF_SQL_INSTANCE_ID={{user `uplf_sql_instance_id` }}",
         "UPLF_SQL_SKIP_INSTALLER_RUN_CHECK={{user `uplf_sql_skip_installer_run_check` }}"
-      ]
+      ],
+      "elevated_user": "vagrant",
+      "elevated_password": "vagrant"
     },
     {
       "type": "powershell",
