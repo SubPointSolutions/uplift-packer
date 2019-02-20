@@ -957,4 +957,19 @@ function Delete-LinkedCloneVMs() {
     }
 }
 
+function Confirm-AppveyorTools() {
+    
+    if($null -ne $env:APPVEYOR) {
+        Write-BuildInfoMessage "Installing additional tools under Appveyor"
+
+        # vagrant install gives 3010 asking for reboot
+        # we using vagrant only for CI testing here, so no reboot or install checks
+
+        #exec {
+            choco install -y packer  --limit-output --acceptlicense --no-progress
+            choco install -y vagrant --limit-output --acceptlicense --no-progress
+        #}
+    }
+}
+
 Confirm-PowerShell

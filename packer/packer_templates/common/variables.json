@@ -21,6 +21,8 @@
         "uplf_disk_size": "100000",
         "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
 
-        "uplf_compression_level" : "6"
+        "uplf_compression_level" : "6",
+
+        "uplf_image_optimize_functions": "Optimize-UpliftNetAssemblies,Optimize-UpliftPowerConfig,Optimize-UpliftWindowsTemp,Optimize-UpliftSystemVolume,Optimize-UpliftZeroSpace"
     }
 }

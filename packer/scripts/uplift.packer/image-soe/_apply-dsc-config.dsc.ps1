@@ -30,6 +30,12 @@ Configuration Configure_UpliftSOE {
 
     Node localhost
     {
+        $winrmFile = $Node.WinrmTaskFilePath
+
+        if ( (Test-Path $winrmFile) -eq $False ) {
+            throw "Cannot find winrm task file: $winrmFile"
+        } 
+
         LocalConfigurationManager
         {
             ConfigurationMode = 'ApplyOnly'
@@ -95,17 +101,16 @@ Configuration Configure_UpliftSOE {
             ValueType   = "DWord"
         }
 
-        ScheduledTask UpliftWinRmStartUp
-        {
-            TaskName           = 'UpliftWinRmStartUp'
-            TaskPath           = '\UpliftTasks'
-            ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
-            ActionArguments    = '-File c:/Windows/Temp/_uplift_winrm.ps1'
-            ScheduleType       = 'AtStartup'
-            RepeatInterval     = '00:15:00'
-            RepetitionDuration = '08:00:00'
-            RunLevel           = 'Highest'
-        }
+        # ScheduledTask UpliftWinRmStartUp
+        # {
+        #     TaskName           = 'UpliftWinRmStartUp'
+        #     TaskPath           = '\UpliftTasks'
+        #     ActionExecutable   = 'C:\windows\system32\WindowsPowerShell\v1.0\powershell.exe'
+        #     ActionArguments    = "-File $winrmFile"
+        #     ScheduleType       = 'AtStartup'
+        #     RunLevel           = 'Highest'
+        #     Description        = 'Configures WinRM to support vagrant based provision'
+        # }
 
         xIEEsc Disable_IEEsc
         {
@@ -123,6 +128,8 @@ $config = @{
             PSDscAllowPlainTextPassword = $true
             RetryCount = 10
             RetryIntervalSec = 30
+
+            WinrmTaskFilePath = $winrmTaskFile
         }
     )
 }

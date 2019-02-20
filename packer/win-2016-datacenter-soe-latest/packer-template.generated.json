@@ -8,6 +8,7 @@
     "uplf_box_spec_dest_folder": "box-spec",
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_compression_level": "6",
+    "uplf_image_optimize_functions": "Optimize-UpliftNetAssemblies,Optimize-UpliftPowerConfig,Optimize-UpliftWindowsTemp,Optimize-UpliftSystemVolume,Optimize-UpliftZeroSpace",
     "uplf_invokeuplift_module_version": "",
     "uplf_uplift_core_module_version": "",
     "uplf_invokeuplift_module_repository": "",
@@ -236,6 +237,12 @@
       "restart_timeout": "15m"
     },
     {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1"
+      ]
+    },
+    {
       "type": "shell-local",
       "command": "echo 'Completed [win-2016-datacenter-soe] provisioners'"
     },
@@ -355,6 +362,10 @@
       "elevated_password": "vagrant"
     },
     {
+      "type": "windows-restart",
+      "restart_timeout": "120m"
+    },
+    {
       "type": "powershell",
       "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
@@ -362,7 +373,13 @@
     },
     {
       "type": "windows-restart",
-      "restart_timeout": "120m"
+      "restart_timeout": "30m"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1"
+      ]
     },
     {
       "type": "shell-local",
@@ -399,6 +416,9 @@
       "type": "powershell",
       "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_optimize-image.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_IMAGE_OPTIMIZE_FUNCTIONS={{user `uplf_image_optimize_functions` }}"
       ]
     },
     {

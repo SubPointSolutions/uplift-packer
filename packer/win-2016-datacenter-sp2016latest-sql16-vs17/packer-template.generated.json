@@ -10,6 +10,7 @@
     "uplf_disk_size": "100000",
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_compression_level": "6",
+    "uplf_image_optimize_functions": "Optimize-UpliftNetAssemblies,Optimize-UpliftPowerConfig,Optimize-UpliftWindowsTemp,Optimize-UpliftSystemVolume,Optimize-UpliftZeroSpace",
     "uplf_sp_product_key": "NQGJR-63HC8-XCRQH-MYVCH-3J3QR",
     "uplf_sp_resource_name": "ms-sharepoint2016-rtm",
     "uplf_sp_lang_pack_resource_names": "ms-sharepoint2016-lang-pack-ar-sa,ms-sharepoint2016-lang-pack-cs-cz,ms-sharepoint2016-lang-pack-da-dk,ms-sharepoint2016-lang-pack-de-de,ms-sharepoint2016-lang-pack-fr-fr,ms-sharepoint2016-lang-pack-fi-fi,ms-sharepoint2016-lang-pack-nl-nl,ms-sharepoint2016-lang-pack-he-il,ms-sharepoint2016-lang-pack-hi-in,ms-sharepoint2016-lang-pack-kk-kz,ms-sharepoint2016-lang-pack-it-it,ms-sharepoint2016-lang-pack-lv-lv,ms-sharepoint2016-lang-pack-pl-pl,ms-sharepoint2016-lang-pack-ru-ru,ms-sharepoint2016-lang-pack-ro-ro,ms-sharepoint2016-lang-pack-es-es,ms-sharepoint2016-lang-pack-sv-se,ms-sharepoint2016-lang-pack-uk-ua",
@@ -337,6 +338,9 @@
       "type": "powershell",
       "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_optimize-image.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_IMAGE_OPTIMIZE_FUNCTIONS={{user `uplf_image_optimize_functions` }}"
       ]
     },
     {

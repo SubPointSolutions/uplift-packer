@@ -22,7 +22,10 @@ $specExtractor     = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-b
 $sql16Variables       = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sql16/variables.json"
 $sql16Provisioners    = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sql16/provisioners.json"
 
-$optimizeUplift    = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-optimize.json"
+$sqlSsmsVariables     = Get-JSON "$packerTemplatesPath/win-2016-datacenter-ssms/variables.json"
+$sqlSsmsProvisioners  = Get-JSON "$packerTemplatesPath/win-2016-datacenter-ssms/provisioners.json"
+
+$optimizeUplift       = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-optimize.json"
 
 $template = @{
     "builders"        = $coreBuilder.builders
@@ -30,12 +33,14 @@ $template = @{
     "variables"       = Merge-Objects `
                             $coreVaiables.variables `
                             $appVariables.variables `
-                            $sql16Variables.variables 
+                            $sql16Variables.variables `
+                            $sqlSsmsVariables.variables
 
     "provisioners"    = Merge-ObjectsAsArray `
                             $coreBuilder.provisioners `
                             $coreUplift.provisioners `
                             $appProvision.provisioners `
+                            $sqlSsmsProvisioners.provisioners `
                             $sql16Provisioners.provisioners `
                             $specExtractor.provisioners `
                             $optimizeUplift.provisioners

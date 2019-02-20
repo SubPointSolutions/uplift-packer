@@ -123,6 +123,11 @@
         },
 
         {
+            "type": "windows-restart",
+            "restart_timeout": "120m"
+        },
+
+        {
             "type": "powershell",
             "scripts": [
                 "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_apply-dsc-config.dsc.ps1"
@@ -131,7 +136,14 @@
 
         {
             "type": "windows-restart",
-            "restart_timeout": "120m"
+            "restart_timeout": "30m"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1"
+            ]
         },
 
         {

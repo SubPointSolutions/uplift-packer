@@ -1,0 +1,79 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_version ">= 2.2.3"
+
+box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-2016-datacenter-soe-master" 
+linked_clone   =  ENV['UPLF_VAGRANT_LINKED_CLONE'].to_s.empty? == false
+machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
+
+vm_client = "sql16-sp2cu2"
+
+# uplift helper for vagrant configurations
+uplift = VagrantPlugins::Uplift::Config()
+
+# base uplif configuration
+uplift.set_network_range("192.168.10")
+uplift.set_config_path("~/.uplift-packer-tests")
+uplift.set_vbmanage_machinefolder('all vms', '', machine_folder)
+
+Vagrant.configure("2") do |config|
+  
+  # additional plugins to be used with this vagrant config
+  config.vagrant.plugins = [
+    "vagrant-reload",
+    "vagrant-uplift"
+  ]
+
+  config.vm.define(vm_client) do | vm_config |   
+    
+    # box config
+    vm_config.vm.box = box_name
+    vm_config.vm.box_check_update = false
+
+    # uplift - base config
+    uplift.set_default_synced_folder(vm_client, vm_config)
+    uplift.set_4Gb(vm_client, vm_config)
+    uplift.set_hostname(vm_client, vm_config, vm_client)    
+    
+    # uplift - network, base provision + dc join
+    uplift.set_client_network(vm_client, vm_config, vm_client)
+
+    if !uplift.has_checkpoint?(vm_client, 'dsc-soe') 
+      uplift.provision_win16_dsc_soe(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'dc-join') 
+      uplift.provision_dc_join(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'dc-join'
+    end
+    
+    # general check
+    vm_config.vm.provision "shell", name: "hostname check", inline: "hostname"
+
+    # uplift sql16 image completion
+    uplift.provision_sql16_complete_image(vm_client, vm_config)
+
+    # optimize sql instance
+    uplift.provision_sql16_optimize(vm_client, vm_config)
+    
+    vm_config.vm.provision "shell",
+        inline: 'Invoke-Sqlcmd -Query "SELECT @@VERSION;" -QueryTimeout 3'
+
+    # virtualbox tuning
+    vm_config.vm.provider "virtualbox" do |v|
+      v.gui  = false
+      
+      v.cpus   = uplift.get_vm_cpus(vm_client, 4)
+      v.memory = uplift.get_vm_memory(vm_client, 4 * 1024)
+
+      v.customize ['modifyvm', :id, '--cpuexecutioncap', '100'] 
+      v.customize ["modifyvm", :id, "--ioapic", "on"]
+
+      v.linked_clone = linked_clone
+    end
+
+  end  
+
+end
