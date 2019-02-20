@@ -10,6 +10,12 @@
         "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
         "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82",
 
+        "uplf_sql_update_resource_names": "",
+
+        "uplf_sql_features": "SQL,RS",
+        "uplf_sql_instance_id": "MSSQLSERVER",
+        "uplf_sql_skip_installer_run_check": "/SkipInstallerRunCheck",
+
         "uplf_bin_repo_http_addr": "10.0.2.2:9091",
 
         "uplf_vboxmanage_cpuexecutioncap": "100",

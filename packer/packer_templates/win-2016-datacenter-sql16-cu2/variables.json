@@ -1,0 +1,5 @@
+{
+    "variables": {
+        "uplf_sql_cu_resource_name": "ms-sql-server2016-update-cu2-KB4340355"
+    }
+}

@@ -1,0 +1,5 @@
+{
+    "variables": {
+        "uplf_sql_update_resource_names": "ms-sql-server2016-update-sp1-kb3182545"
+    }
+}
