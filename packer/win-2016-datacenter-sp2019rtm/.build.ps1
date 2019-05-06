@@ -14,7 +14,9 @@ $coreBuilder       = Get-JSON "$packerTemplatesPath/common/builders-win-2016-vag
 $corePostProcessor = Get-JSON "$packerTemplatesPath/common/post-processors-win-2016-vagrant.json"
 
 # use 2016 provision with 2019 parameters
+$sp16BinVariables     = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sp2016bin/variables.json"
 $sp19BinVariables     = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sp2019bin/variables.json"
+
 $sp19BinProvisioners  = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sp2016bin/provisioners.json"
 
 $specExtractor     = Get-JSON "$packerTemplatesPath/common/provisioners-uplift-box-spec-extractor.json"
@@ -26,6 +28,7 @@ $template = @{
 
     "variables"       = Merge-Objects `
                             $coreVaiables.variables `
+                            $sp16BinVariables.variables `
                             $sp19BinVariables.variables `
                             $sp19RtmVariables.variables
 
