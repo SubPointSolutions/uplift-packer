@@ -536,11 +536,11 @@ function New-PackerBuildContainer {
 
     $packerBuildLogFolder = "$packerBuildFolder/logs"
 
-    [System.IO.Directory]::CreateDirectory($packerBuildFolder) | Out-Null
+    New-Item -ItemType Directory -Force -Path $packerBuildFolder | Out-Null
     $containerFolder    = Resolve-Path -Path $containerFolder
     $containerFolder    = Resolve-Path -Path $packerBuildFolder
 
-    [System.IO.Directory]::CreateDirectory($packerBuildLogFolder) | Out-Null
+    New-Item -ItemType Directory -Force -Path $packerBuildLogFolder | Out-Null
     $packerBuildLogFolder    = Resolve-Path -Path $packerBuildLogFolder
 
     $vagrantBoxFile  = "$packerBuildFolder/box/box.box"
