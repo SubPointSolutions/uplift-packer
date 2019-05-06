@@ -4,13 +4,13 @@
 
         {
             "type": "shell-local",
-            "command": "echo 'Starting [provisioners-uplift-sharepoint2016-binm] provisioners'"
+            "command": "echo 'Starting [provisioners-uplift-sharepoint2016-bin] provisioners'"
         },
 
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_packages.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_img_packages_script_name`}}"
             ],
             "environment_vars": [
                 
@@ -19,7 +19,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_config.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_img_config_script_name`}}"
             ],
             "environment_vars": [
                 
@@ -33,7 +33,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_image_config.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_img_config_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_DSC_CHECK=1"
@@ -43,7 +43,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_prerequisite_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest"
@@ -78,7 +78,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_prerequisite_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest"
@@ -90,7 +90,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_pre_rtm.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_prerequisite_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest",
@@ -101,7 +101,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_bin.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_bin_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest",
@@ -115,7 +115,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_bin.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_bin_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest",
@@ -127,7 +127,7 @@
         {
             "type": "powershell",
             "scripts": [
-                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/_sp2013_lang_pack.dsc.ps1"
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_lang_pack_script_name`}}"
             ],
             "environment_vars": [
                 "UPLF_SP_LANG_PACK_RESOURCE_NAMES={{user `uplf_sp_lang_pack_resource_names`}}",
@@ -157,7 +157,7 @@
         
         {
             "type": "shell-local",
-            "command": "echo 'Completed [provisioners-uplift-sharepoint2016-binm] provisioners'"
+            "command": "echo 'Completed [provisioners-uplift-sharepoint2016-bin] provisioners'"
         }
 
     ]
