@@ -55,7 +55,7 @@ Configuration SP2013_RTM_InstallPrereqs_Online
 Configuration SP2013_RTM_InstallPrereqs_Offline
 {
     Import-DscResource -ModuleName PSDesiredStateConfiguration
-    Import-DscResource -ModuleName SharePointDsc -ModuleVersion "1.9.0.0"
+    Import-DscResource -ModuleName SharePointDsc -ModuleVersion "3.3.0.0"
 
     node "localhost"
     {
