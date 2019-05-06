@@ -1,0 +1,36 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [win-2016-datacenter-exchange16] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+              "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-features.ps1",
+              "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-ps-modules.ps1"
+            ]
+        },
+
+        {
+          "type": "powershell",
+          "scripts": [
+            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-ucma4.ps1",
+            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-vcredist2013.ps1",
+            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-net471.ps1",
+            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-cred-ssp.ps1"
+          ]
+        },
+
+        {
+          "type": "windows-restart"
+        },
+       
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [win-2016-datacenter-exchange16] provisioners'"
+        }
+    ]
+}
