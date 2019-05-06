@@ -47,3 +47,5 @@ uplift-local-resources
 
 tests/**/*
 tests@tmp/**/*
+
+**/.release-notes.md

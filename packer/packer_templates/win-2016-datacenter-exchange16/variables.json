@@ -1,0 +1,14 @@
+{
+    "variables": {
+        "uplf_input_box_name": "uplift-local/win-2016-datacenter-app",
+
+        "uplf_output_directory": "packer_builds/win-2016-datacenter-exchange16",
+        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-exchange16/win-2016-datacenter-exchange16.box",
+
+        "uplf_exchange_ucma4_resource_name": "ms-exchange2016-prerequisites-ucma4",
+        
+        "uplf_exchange_kb3206632_resource_name": "ms-exchange2016-prerequisites-kb3206632",
+        "uplf_exchange_kb3206632_kb_name": "kb3206632",
+        "uplf_exchange_kb3206632_kb_file_name": "windows10.0-kb3206632-x64_b2e20b7e1aa65288007de21e88cd21c3ffb05110.msu"
+    }
+}
