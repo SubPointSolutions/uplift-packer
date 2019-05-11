@@ -1,2 +1,1 @@
-vagrant destroy client -f
-vagrant destroy sql -f
+vagrant destroy sp19rtm-s16v17 -f
