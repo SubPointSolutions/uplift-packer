@@ -14,10 +14,10 @@
     "uplf_winrm_task_file_path": "c:/uplift_scripts/uplift_winrm.ps1",
     "uplf_compression_level": "6",
     "uplf_image_optimize_functions": "Optimize-UpliftNetAssemblies,Optimize-UpliftPowerConfig,Optimize-UpliftWindowsTemp,Optimize-UpliftSystemVolume,Optimize-UpliftZeroSpace",
-    "uplf_input_box_name": "uplift-local/win-2016-datacenter-soe",
-    "uplf_output_directory": "packer_builds/win-2016-datacenter-app",
-    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-app/win-2016-datacenter-app.box",
     "uplf_invokeuplift_module_version": "",
+    "uplf_input_box_name": "uplift-local/win-2016-datacenter-app",
+    "uplf_output_directory": "packer_builds/win-2016-datacenter-exchange16",
+    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-exchange16/win-2016-datacenter-exchange16.box",
     "uplf_exchange_ucma4_resource_name": "ms-exchange2016-prerequisites-ucma4",
     "uplf_exchange_kb3206632_resource_name": "ms-exchange2016-prerequisites-kb3206632",
     "uplf_exchange_kb3206632_kb_name": "kb3206632",
@@ -74,7 +74,99 @@
       "source": "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
       "destination": "{{user `uplf_winrm_task_file_path` }}"
     },
-    
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [builders-win2016-vagrant] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [provisioners-uplift-core] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_bootstrap_uplift.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/uplift-metadata.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_BOX_METADATA_GIT_BRANCH={{user `uplf_git_branch` }}",
+        "UPLF_BOX_METADATA_GIT_COMMIT={{user `uplf_git_commit` }}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/list-installed-kb.ps1"
+      ]
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [provisioners-uplift-core] provisioners'"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Starting [win-2016-datacenter-app] provisioners'"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-app/_install-netcore-feature.dsc.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-app/_install-netcore-feature.dsc.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_DSC_CHECK=1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-app/_app_image.dsc.ps1"
+      ],
+      "environment_vars": [
+        "UPLF_DSC_CHECK=1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "Write-Host 'Installing Web Platform Installer...'",
+        "choco install -y webpicmd --limit-output --acceptlicense --no-progress"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
+        "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
+      ]
+    },
+    {
+      "type": "windows-restart",
+      "restart_timeout": "5m"
+    },
+    {
+      "type": "shell-local",
+      "command": "echo 'Completed [win-2016-datacenter-app] provisioners'"
+    },
     {
       "type": "shell-local",
       "command": "echo 'Starting [win-2016-datacenter-exchange16] provisioners'"
@@ -82,7 +174,8 @@
     {
       "type": "powershell",
       "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-features.ps1"
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-features.ps1",
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-exchange/ex-ps-modules.ps1"
       ]
     },
     {

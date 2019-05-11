@@ -37,8 +37,8 @@ $template = @{
                             $coreBuilder.provisioners `
                             $coreUplift.provisioners `
                             $sp16BinProvisioners.provisioners `
-                            $specExtractor.provisioners `
                             $vs17Provisioners.provisioners `
+                            $specExtractor.provisioners `
                             $optimizeUplift.provisioners
 
     "post-processors" = $corePostProcessor.'post-processors'
