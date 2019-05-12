@@ -1,1 +1,1 @@
-vagrant destroy sp19rtm-s16v17 -f
+vagrant destroy sp19rtm -f

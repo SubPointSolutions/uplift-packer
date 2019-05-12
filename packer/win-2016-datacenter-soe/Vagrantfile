@@ -11,9 +11,9 @@ vm_client = "soe-cl"
 
 uplift = VagrantPlugins::Uplift::Config()
 
+# base uplif configuration
 uplift.set_network_range("192.168.10")
 uplift.set_config_path("~/.uplift-packer-tests")
-
 uplift.set_vbmanage_machinefolder('all vms', '', machine_folder)
 
 Vagrant.configure("2") do |config|

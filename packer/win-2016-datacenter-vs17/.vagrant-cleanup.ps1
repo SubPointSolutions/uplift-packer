@@ -1,1 +1,1 @@
-vagrant destroy vs17-single -f
+vagrant destroy -f

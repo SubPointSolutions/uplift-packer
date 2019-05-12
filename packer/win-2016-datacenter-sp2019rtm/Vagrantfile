@@ -9,8 +9,6 @@ machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
 
 vm_client = "sp19rtm"
 
-require_relative './../Vagrantfile.rb'
-
 # uplift helper for vagrant configurations
 uplift = VagrantPlugins::Uplift::Config()
 

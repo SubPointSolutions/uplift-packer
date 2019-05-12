@@ -7,9 +7,7 @@ box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-2016-d
 linked_clone   =  ENV['UPLF_VAGRANT_LINKED_CLONE'].to_s.empty? == false
 machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
 
-vm_client = "sp19rtm-s16v17"
-
-require_relative './../Vagrantfile.rb'
+vm_client = "sp19latest-s16v17"
 
 # uplift helper for vagrant configurations
 uplift = VagrantPlugins::Uplift::Config()
