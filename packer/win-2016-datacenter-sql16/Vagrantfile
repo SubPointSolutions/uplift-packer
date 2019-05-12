@@ -3,17 +3,16 @@
 
 box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-2016-datacenter-sql16" 
 linked_clone   =  !ENV['UPLF_VAGRANT_LINKED_CLONE'].nil?
+machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
 
 vm_name_sql = "s16-single"
 
-# testing strategy:
-# dc - apply standard SOE, create domain controller
-# sql - apply standard SOE, perform domain join, ccomplete SQL image
-
-require_relative './../Vagrantfile.rb'
-
 uplift = VagrantPlugins::Uplift::Config()
+
+# base uplif configuration
 uplift.set_network_range("192.168.10")
+uplift.set_config_path("~/.uplift-packer-tests")
+uplift.set_vbmanage_machinefolder('all vms', '', machine_folder)
 
 Vagrant.configure("2") do |config|
   
