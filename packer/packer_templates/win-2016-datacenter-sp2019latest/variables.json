@@ -1,5 +1,8 @@
 {
     "variables": {
-        "uplf_sp_update_resource_names": "ms-sharepoint2019-update-2019.04.09-4464518"
+        "uplf_sp_update_resource_names": "ms-sharepoint2019-update-2019.04.09-KB4464518",
+
+        "uplf_output_directory": "packer_builds/win-2016-datacenter-sp2019latest-sql16-vs17",
+        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-sp2019latest-sql16-vs17/win-2016-datacenter-sp2019latest-sql16-vs17.box"
     }
 }

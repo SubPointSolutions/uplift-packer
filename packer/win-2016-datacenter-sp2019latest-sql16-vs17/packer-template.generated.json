@@ -24,7 +24,6 @@
     "uplf_sp_prerequisite_script_name": "_sp2019_pre_rtm.dsc.ps1",
     "uplf_sp_bin_script_name": "_sp2019_bin.dsc.ps1",
     "uplf_sp_lang_pack_resource_names": "ms-sharepoint2019-lang-pack-ar-sa,ms-sharepoint2019-lang-pack-cs-cz,ms-sharepoint2019-lang-pack-da-dk,ms-sharepoint2019-lang-pack-de-de,ms-sharepoint2019-lang-pack-fr-fr,ms-sharepoint2019-lang-pack-fi-fi,ms-sharepoint2019-lang-pack-nl-nl,ms-sharepoint2019-lang-pack-he-il,ms-sharepoint2019-lang-pack-hi-in,ms-sharepoint2019-lang-pack-kk-kz,ms-sharepoint2019-lang-pack-it-it,ms-sharepoint2019-lang-pack-lv-lv,ms-sharepoint2019-lang-pack-pl-pl,ms-sharepoint2019-lang-pack-ru-ru,ms-sharepoint2019-lang-pack-ro-ro,ms-sharepoint2019-lang-pack-es-es,ms-sharepoint2019-lang-pack-sv-se,ms-sharepoint2019-lang-pack-uk-ua",
-    "uplf_sp_update_resource_names": "ms-sharepoint2019-update-2019.04.09-4464518",
     "uplf_vs17_resource_name": "ms-visualstudio-2017.ent-dist-office-dev",
     "uplf_vs17_executable_name": "vs_enterprise.exe",
     "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension;Microsoft.VisualStudio.Workload.Azure",
@@ -34,9 +33,10 @@
     "uplf_vboxmanage_cpus": "4",
     "uplf_vboxmanage_memory": "4096",
     "uplf_input_box_name": "uplift-local/win-2016-datacenter-soe",
-    "uplf_output_directory": "packer_builds/win-2016-datacenter-app",
-    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-app/win-2016-datacenter-app.box",
-    "uplf_invokeuplift_module_version": ""
+    "uplf_invokeuplift_module_version": "",
+    "uplf_sp_update_resource_names": "ms-sharepoint2019-update-2019.04.09-kb4464518",
+    "uplf_output_directory": "packer_builds/win-2016-datacenter-sp2019latest-sql16-vs17",
+    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-sp2019latest-sql16-vs17/win-2016-datacenter-sp2019latest-sql16-vs17.box"
   },
   "builders": [
     {

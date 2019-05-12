@@ -1,5 +1,8 @@
 {
     "variables": {
-        "uplf_sp_update_resource_names": ""
+        "uplf_sp_update_resource_names": "",
+
+        "uplf_output_directory": "packer_builds/win-2016-datacenter-sp2019rtm",
+        "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-sp2019rtm/win-2016-datacenter-sp2019rtm.box"
     }
 }

@@ -2,8 +2,6 @@
   "variables": {
     "uplf_http_directory": "",
     "uplf_scripts_path": "./../",
-    "uplf_output_directory": "packer_builds/win2016-mb-soe",
-    "uplf_vagrant_box_output": "packer_boxes/win2016-mb-soe-bare/win2016-mb-soe.box",
     "uplf_local_repository_path": "c:/_uplift_resources",
     "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_vboxmanage_cpus": "4",
@@ -25,7 +23,9 @@
     "uplf_sp_prerequisite_script_name": "_sp2019_pre_rtm.dsc.ps1",
     "uplf_sp_bin_script_name": "_sp2019_bin.dsc.ps1",
     "uplf_sp_lang_pack_resource_names": "ms-sharepoint2019-lang-pack-ar-sa,ms-sharepoint2019-lang-pack-cs-cz,ms-sharepoint2019-lang-pack-da-dk,ms-sharepoint2019-lang-pack-de-de,ms-sharepoint2019-lang-pack-fr-fr,ms-sharepoint2019-lang-pack-fi-fi,ms-sharepoint2019-lang-pack-nl-nl,ms-sharepoint2019-lang-pack-he-il,ms-sharepoint2019-lang-pack-hi-in,ms-sharepoint2019-lang-pack-kk-kz,ms-sharepoint2019-lang-pack-it-it,ms-sharepoint2019-lang-pack-lv-lv,ms-sharepoint2019-lang-pack-pl-pl,ms-sharepoint2019-lang-pack-ru-ru,ms-sharepoint2019-lang-pack-ro-ro,ms-sharepoint2019-lang-pack-es-es,ms-sharepoint2019-lang-pack-sv-se,ms-sharepoint2019-lang-pack-uk-ua",
-    "uplf_sp_update_resource_names": ""
+    "uplf_sp_update_resource_names": "",
+    "uplf_output_directory": "packer_builds/win-2016-datacenter-sp2019rtm",
+    "uplf_vagrant_box_output": "packer_boxes/win-2016-datacenter-sp2019rtm/win-2016-datacenter-sp2019rtm.box"
   },
   "builders": [
     {

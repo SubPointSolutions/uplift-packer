@@ -25,13 +25,6 @@
     "uplf_sp_bin_script_name": "_sp2019_bin.dsc.ps1",
     "uplf_sp_lang_pack_resource_names": "ms-sharepoint2019-lang-pack-ar-sa,ms-sharepoint2019-lang-pack-cs-cz,ms-sharepoint2019-lang-pack-da-dk,ms-sharepoint2019-lang-pack-de-de,ms-sharepoint2019-lang-pack-fr-fr,ms-sharepoint2019-lang-pack-fi-fi,ms-sharepoint2019-lang-pack-nl-nl,ms-sharepoint2019-lang-pack-he-il,ms-sharepoint2019-lang-pack-hi-in,ms-sharepoint2019-lang-pack-kk-kz,ms-sharepoint2019-lang-pack-it-it,ms-sharepoint2019-lang-pack-lv-lv,ms-sharepoint2019-lang-pack-pl-pl,ms-sharepoint2019-lang-pack-ru-ru,ms-sharepoint2019-lang-pack-ro-ro,ms-sharepoint2019-lang-pack-es-es,ms-sharepoint2019-lang-pack-sv-se,ms-sharepoint2019-lang-pack-uk-ua",
     "uplf_sp_update_resource_names": "",
-    "uplf_sql_resource_name": "ms-sql-server2016-rtm",
-    "uplf_sql_studio_resource_name": "ms-sql-server-management-studio-17.04",
-    "uplf_sql_studio_product_id": "F8ADD24D-F2F2-465C-A675-F12FDB70DB82",
-    "uplf_sql_update_resource_names": "",
-    "uplf_sql_features": "SQL,RS",
-    "uplf_sql_instance_id": "MSSQLSERVER",
-    "uplf_sql_skip_installer_run_check": "/SkipInstallerRunCheck",
     "uplf_vs17_resource_name": "ms-visualstudio-2017.ent-dist-office-dev",
     "uplf_vs17_executable_name": "vs_enterprise.exe",
     "uplf_vs17_package_ids": "Microsoft.VisualStudio.Workload.Office;Microsoft.VisualStudio.Workload.ManagedDesktop;Microsoft.VisualStudio.Workload.NetCoreTools;Microsoft.VisualStudio.Workload.NetWeb;Microsoft.VisualStudio.Workload.Node;Microsoft.VisualStudio.Workload.VisualStudioExtension;Microsoft.VisualStudio.Workload.Azure",
@@ -407,69 +400,6 @@
     {
       "type": "shell-local",
       "command": "echo 'Completed [provisioners-uplift-sharepoint2016-bin] provisioners'"
-    },
-    {
-      "type": "shell-local",
-      "command": "echo 'Starting [provisioners-uplift-sql16] provisioners'"
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_RESOURCE_NAME={{user `uplf_sql_resource_name`}}",
-        "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
-        "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/sql-image-packages.ps1"
-      ],
-      "environment_vars": []
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-sql16-update-dist-helper.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_SQL_BIN_RESOURCE_NAME={{user `uplf_sql_resource_name`}}",
-        "UPLF_SQL_UPDATE_RESOURCE_NAMES={{user `uplf_sql_update_resource_names`}}",
-        "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
-        "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/sql-prepare-script.ps1"
-      ],
-      "environment_vars": [
-        "UPLF_DSC_CHECK=1",
-        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sql_resource_name`}}/latest",
-        "UPLF_SQL_FEATURES={{user `uplf_sql_features` }}",
-        "UPLF_SQL_INSTANCE_ID={{user `uplf_sql_instance_id` }}",
-        "UPLF_SQL_SKIP_INSTALLER_RUN_CHECK={{user `uplf_sql_skip_installer_run_check` }}"
-      ],
-      "elevated_user": "vagrant",
-      "elevated_password": "vagrant"
-    },
-    {
-      "type": "powershell",
-      "inline": [
-        "Remove-Item 'C:/_uplift_*' -Recurse -Force -ErrorAction SilentlyContinue",
-        "Remove-Item '{{user `uplf_local_repository_path` }}' -Recurse -Force -ErrorAction SilentlyContinue"
-      ]
-    },
-    {
-      "type": "windows-restart"
-    },
-    {
-      "type": "shell-local",
-      "command": "echo 'Completed [provisioners-uplift-sql16] provisioners'"
     },
     {
       "type": "shell-local",
