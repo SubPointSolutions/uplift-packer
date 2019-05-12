@@ -15,7 +15,7 @@ $packages = @(
 
     # using for better file download experience
     # PowerShell can't handle huge files over seevral Gb
-    @{ Id = "wget"; Version = "" }
+    @{ Id = "wget"; Version = "1.20" }
     @{ Id = "curl"; Version = "" }
 
     # modern PowerShell experience

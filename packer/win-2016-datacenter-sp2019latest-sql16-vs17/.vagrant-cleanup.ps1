@@ -1,1 +1,1 @@
-vagrant destroy sp19latest-s16v17 -f
+vagrant destroy -f
