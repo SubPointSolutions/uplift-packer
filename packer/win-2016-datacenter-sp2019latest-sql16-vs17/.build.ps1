@@ -42,9 +42,9 @@ $template = @{
                             $sp16BinVariables.variables `
                             $sp19BinVariables.variables `
                             $sp19RtmVariables.variables `
-                            $sp19LatestVariables.variables `
                             $vs17Variables.variables `
-                            $appVariables.variables
+                            $appVariables.variables `
+                            $sp19LatestVariables.variables 
 
     "provisioners"    = Merge-ObjectsAsArray `
                             $coreBuilder.provisioners `

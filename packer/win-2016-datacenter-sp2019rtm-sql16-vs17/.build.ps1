@@ -18,9 +18,6 @@ $sp19BinVariables     = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sp201
 
 $sp19BinProvisioners  = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sp2016bin/provisioners.json"
 
-$sql16Variables       = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sql16/variables.json"
-$sql16Provisioners    = Get-JSON "$packerTemplatesPath/win-2016-datacenter-sql16/provisioners.json"
-
 $vs17Variables        = Get-JSON "$packerTemplatesPath/win-2016-datacenter-vs17/variables.json"
 $vs17Provisioners     = Get-JSON "$packerTemplatesPath/win-2016-datacenter-vs17/provisioners.json"
 
@@ -42,7 +39,6 @@ $template = @{
                             $sp16BinVariables.variables `
                             $sp19BinVariables.variables `
                             $sp19RtmVariables.variables `
-                            $sql16Variables.variables `
                             $vs17Variables.variables `
                             $appVariables.variables
 
@@ -52,7 +48,6 @@ $template = @{
                             $soeUpliftProvisioners.provisioners `
                             $appProvision.provisioners `
                             $sp19BinProvisioners.provisioners `
-                            $sql16Provisioners.provisioners `
                             $vs17Provisioners.provisioners `
                             $specExtractor.provisioners
 
