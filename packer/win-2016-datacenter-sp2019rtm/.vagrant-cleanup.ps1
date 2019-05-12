@@ -1,1 +1,1 @@
-vagrant destroy sp19rtm -f
+vagrant destroy -f
