@@ -37,6 +37,10 @@ param(
     $UPLF_VBOXMANAGE_CPUS = $null,
     $UPLF_VBOXMANAGE_CPUEXECUTIONCAP = "100",
 
+    $UPLF_HYPERV_MEMORY = $null,
+    $UPLF_HYPERV_CPUS = $null,
+    $UPLF_HYPERV_SWITCH_NAME = $null,
+
     # hardened soe image
     $UPLF_SSU_RESOURCE_NAME = $null,
     $UPLF_SSU_NAME = $null,
@@ -104,6 +108,8 @@ param(
     $PACKER_NO_COLOR = $null,
     $PACKER_PLUGIN_MAX_PORT = $null,
     $PACKER_PLUGIN_MIN_PORT = $null,
+
+    $PACKER_ONLY= "virtualbox-iso",
 
     # QA params
     $QA_FIX = $null,

@@ -44,5 +44,15 @@ Vagrant.configure(2) do |config|
     # Vagrant is reconnecting from scratch, sometimes literally before each command in negotiating loop
     v.customize ['modifyvm', :id, "--natdnshostresolver1", "off"]
   end
+
+  # defaults for hyperv
+  config.vm.provider "hyperv" do |v|
+    v.memory = 1024
+    v.cpus    = 2
+
+    # disable shared folder by default
+    # vagrant won't ask for SMB share pass
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+  end
   
 end

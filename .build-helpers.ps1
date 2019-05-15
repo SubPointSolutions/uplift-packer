@@ -653,13 +653,17 @@ function Invoke-PackerBuild($force = $false) {
         exec {
             Set-PackerEnvVariables
 
+            $packerOnlyValue = $script:PACKER_ONLY
+
             if($force -eq $True) {
                 packer build `
                     -force `
+                    -only $packerOnlyValue `
                     -var-file="$($container.VariablesFile)" `
                     "$($container.PackerFile)"
             } else {
                 packer build `
+                    -only $packerOnlyValue `
                     -var-file="$($container.VariablesFile)" `
                     "$($container.PackerFile)"
             }

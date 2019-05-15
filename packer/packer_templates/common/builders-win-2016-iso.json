@@ -1,64 +1,105 @@
 {
-    "builders": [{
-        "type": "virtualbox-iso",
+    "builders": [
+        {
+            "type": "virtualbox-iso",
 
-        "iso_url": "{{user `uplf_iso_url`}}",
-        "iso_checksum": "{{user `uplf_iso_checksum`}}",
-        "iso_checksum_type": "{{user `uplf_iso_checksum_type`}}",
+            "iso_url": "{{user `uplf_iso_url`}}",
+            "iso_checksum": "{{user `uplf_iso_checksum`}}",
+            "iso_checksum_type": "{{user `uplf_iso_checksum_type`}}",
 
-        "vm_name": "uplift-{{ build_type }}-{{ timestamp }}",
+            "vm_name": "uplift-{{ build_type }}-{{ timestamp }}",
 
-        "output_directory": "{{user `uplf_output_directory`}}",
-        "http_directory": "{{user `uplf_http_directory`}}",
+            "output_directory": "{{user `uplf_output_directory`}}",
+            "http_directory": "{{user `uplf_http_directory`}}",
 
-        "headless": true,
+            "headless": true,
 
-        "disk_size": "{{user `uplf_disk_size`}}",
-        "guest_additions_mode": "attach",
-        "guest_os_type": "Windows2016_64",
+            "boot_wait": "2m",
 
-        "communicator": "winrm",
-        "winrm_username": "vagrant",
-        "winrm_password": "vagrant",
-        "winrm_timeout": "12h",
+            "disk_size": "{{user `uplf_disk_size`}}",
+            "guest_additions_mode": "attach",
+            "guest_os_type": "Windows2016_64",
 
-        "shutdown_command": "IF EXIST c:\\run-sysprep.cmd (CALL c:\\run-sysprep.cmd) ELSE (IF EXIST e:\\run-sysprep.cmd (CALL e:\\run-sysprep.cmd) ELSE (CALL f:\\run-sysprep.cmd)) &IF \"%ERRORLEVEL%\" == \"0\" (ECHO \"Shutdown script succeeded with exit code = %ERRORLEVEL%\" &EXIT 0) ELSE (ECHO \"Shutdown script failed with exit code = %ERRORLEVEL%\" &EXIT %ERRORLEVEL%)",
-        "shutdown_timeout": "15m",
+            "communicator": "winrm",
+            "winrm_username": "vagrant",
+            "winrm_password": "vagrant",
+            "winrm_timeout": "12h",
 
-        "post_shutdown_delay": "2m",
-        "floppy_files": [
-            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/answer_files/autounattend.xml",
-            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
-            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.cmd",
-            "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.ps1"
-        ],
-        "vboxmanage": [
-            [
-                "modifyvm",
-                "{{.Name}}",
-                "--memory",
-                "{{user `uplf_vboxmanage_memory`}}"
+            "shutdown_command": "IF EXIST c:\\run-sysprep.cmd (CALL c:\\run-sysprep.cmd) ELSE (IF EXIST e:\\run-sysprep.cmd (CALL e:\\run-sysprep.cmd) ELSE (CALL f:\\run-sysprep.cmd)) &IF \"%ERRORLEVEL%\" == \"0\" (ECHO \"Shutdown script succeeded with exit code = %ERRORLEVEL%\" &EXIT 0) ELSE (ECHO \"Shutdown script failed with exit code = %ERRORLEVEL%\" &EXIT %ERRORLEVEL%)",
+            "shutdown_timeout": "15m",
+
+            "post_shutdown_delay": "2m",
+            "floppy_files": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/answer_files/autounattend.xml",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.cmd",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.ps1"
             ],
-            [
-                "modifyvm",
-                "{{.Name}}",
-                "--vram",
-                "48"
-            ],
-            [
-                "modifyvm",
-                "{{.Name}}",
-                "--cpus",
-                "{{user `uplf_vboxmanage_cpus`}}"
-            ],
-            [
-                "modifyvm",
-                "{{.Name}}",
-                "--cpuexecutioncap",
-                "{{user `uplf_vboxmanage_cpuexecutioncap`}}"
+            "vboxmanage": [
+                [
+                    "modifyvm",
+                    "{{.Name}}",
+                    "--memory",
+                    "{{user `uplf_vboxmanage_memory`}}"
+                ],
+                [
+                    "modifyvm",
+                    "{{.Name}}",
+                    "--vram",
+                    "48"
+                ],
+                [
+                    "modifyvm",
+                    "{{.Name}}",
+                    "--cpus",
+                    "{{user `uplf_vboxmanage_cpus`}}"
+                ],
+                [
+                    "modifyvm",
+                    "{{.Name}}",
+                    "--cpuexecutioncap",
+                    "{{user `uplf_vboxmanage_cpuexecutioncap`}}"
+                ]
             ]
-        ]
-    }],
+        },
+        {
+            "type": "hyperv-iso",
+            "guest_additions_mode": "disable",
+            
+            "iso_url": "{{user `uplf_iso_url`}}",
+            "iso_checksum": "{{user `uplf_iso_checksum`}}",
+            "iso_checksum_type": "{{user `uplf_iso_checksum_type`}}",
+
+            "vm_name": "uplift-{{ build_type }}-{{ timestamp }}",
+
+            "output_directory": "{{user `uplf_output_directory`}}",
+            "http_directory": "{{user `uplf_http_directory`}}",
+            
+            "boot_wait": "2m",
+
+            "cpus": "{{user `uplf_hyperv_cpus`}}",
+            "memory": "{{user `uplf_hyperv_memory`}}",
+
+            "switch_name": "{{user `uplf_hyperv_switch_name`}}",
+
+            "disk_size": "{{user `uplf_disk_size`}}",
+            
+            "communicator": "winrm",
+            "winrm_username": "vagrant",
+            "winrm_password": "vagrant",
+            "winrm_timeout": "12h",
+            
+            "shutdown_command": "IF EXIST c:\\run-sysprep.cmd (CALL c:\\run-sysprep.cmd) ELSE (IF EXIST e:\\run-sysprep.cmd (CALL e:\\run-sysprep.cmd) ELSE (CALL f:\\run-sysprep.cmd)) &IF \"%ERRORLEVEL%\" == \"0\" (ECHO \"Shutdown script succeeded with exit code = %ERRORLEVEL%\" &EXIT 0) ELSE (ECHO \"Shutdown script failed with exit code = %ERRORLEVEL%\" &EXIT %ERRORLEVEL%)",
+            "shutdown_timeout": "15m",
+
+            "floppy_files": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/answer_files/autounattend.xml",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/winrm.ps1",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.cmd",
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe-win2016/scripts/run-sysprep-nounattend.ps1"
+            ]
+        }
+    ],
     "provisioners": [
 
         {
