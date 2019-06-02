@@ -1,0 +1,34 @@
+{
+    "provisioners": [
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Starting [win-2012r2-datacenter-bare] provisioners'"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_choco_bootstrap_win2012r2.ps1"
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+
+        {
+            "type": "windows-restart"
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/image-soe/_setup-ps-nuget_win2012r2.ps1"
+            ]
+        },
+
+        {
+            "type": "shell-local",
+            "command": "echo 'Completed [win-2012r2-datacenter-bare] provisioners'"
+        }
+    ]
+}

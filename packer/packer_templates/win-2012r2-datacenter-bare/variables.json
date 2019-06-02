@@ -1,0 +1,17 @@
+{
+    "variables": {
+        "uplf_iso_url": "http://download.microsoft.com/download/6/2/A/62A76ABB-9990-4EFC-A4FE-C7D698DAEB96/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO",
+        "uplf_iso_checksum": "6612B5B1F53E845AACDF96E974BB119A3D9B4DCB5B82E65804AB7E534DC7B4D5",
+        "uplf_iso_checksum_type": "sha256",
+
+        "uplf_disk_size": "80000",
+
+        "uplf_vboxmanage_memory": "4096",
+        "uplf_vboxmanage_cpus": "4",
+
+        "uplf_output_directory": "packer_builds/win-2012r2-datacenter-bare",
+        "uplf_vagrant_box_output": "packer_boxes/win-2012r2-datacenter-bare/win-2012r2-datacenter-bare.box",
+
+        "uplf_compression_level" : "0"
+    }
+}

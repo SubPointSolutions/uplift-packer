@@ -1,0 +1,119 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_version ">= 2.2.3"
+
+box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-2016-datacenter-sp2016latest-sql16-vs17-master" 
+linked_clone   =  ENV['UPLF_VAGRANT_LINKED_CLONE'].to_s.empty? == false
+machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
+
+vm_client = "sp16l-s16v17"
+
+# uplift helper for vagrant configurations
+uplift = VagrantPlugins::Uplift::Config()
+
+# base uplif configuration
+uplift.set_network_range("192.168.10")
+uplift.set_config_path("~/.uplift-packer-tests")
+uplift.set_vbmanage_machinefolder('all vms', '', machine_folder)
+
+Vagrant.configure("2") do |config|
+  
+  # additional plugins to be used with this vagrant config
+  config.vagrant.plugins = [
+    "vagrant-reload",
+    "vagrant-uplift"
+  ]
+
+  config.vm.define "#{vm_client}" do | vm_config |   
+    
+    # box config
+    vm_config.vm.box = box_name
+    vm_config.vm.box_check_update = false
+
+    # uplift - base config
+    uplift.set_default_synced_folder(vm_client, vm_config)
+    uplift.set_6Gb(vm_client, vm_config)
+    uplift.set_hostname(vm_client, vm_config, vm_client)   
+
+    # uplift - network, base provision + dc join
+    uplift.set_client_network(vm_client, vm_config, vm_client)
+
+    if !uplift.has_checkpoint?(vm_client, 'dsc-soe') 
+      uplift.provision_win16_dsc_soe(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'dsc-soe'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'dc-join') 
+      uplift.provision_dc_join(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'dc-join'
+    end
+
+    # complete sql image
+    uplift.provision_sql16_complete_image(vm_client, vm_config)
+
+    # optimize sql instance
+    uplift.provision_sql16_optimize(vm_client, vm_config)
+
+    # complete sharepoint install
+
+    # - pre-setup and fixes
+    if !uplift.has_checkpoint?(vm_client, 'sp-farm-presetup') 
+      uplift.provision_sp16_pre_setup(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-presetup'
+    end
+
+    # - accounts
+    if !uplift.has_checkpoint?(vm_client, 'sp-accounts') 
+      uplift.provision_sp16_sp_accounts(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-accounts'
+    end
+
+    if !uplift.has_checkpoint?(vm_client, 'sp-sql-accounts') 
+      uplift.provision_sp16_sql_accounts(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-sql-accounts'
+    end
+
+    # - farm creation
+    if !uplift.has_checkpoint?(vm_client, 'sp-single-server-farm') 
+      uplift.provision_sp16_single_server_farm(vm_client, vm_config, vm_client)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-single-server-farm'
+    end
+
+    # - default services
+    if !uplift.has_checkpoint?(vm_client, 'sp-farm-minimal-services') 
+      uplift.provision_sp16_minimal_services(vm_client, vm_config, vm_client)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-minimal-services'
+    end
+
+    # - post-setup tasks, upgrades 
+    if !uplift.has_checkpoint?(vm_client, 'sp-farm-post-setup') 
+      uplift.provision_sp16_farm_post_setup(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-farm-post-setup'
+    end
+
+    # - default web app
+    if !uplift.has_checkpoint?(vm_client, 'sp-web-app') 
+      uplift.provision_sp16_web_application(vm_client, vm_config)
+      vm_config.vm.provision :uplift_checkpoint, name: 'sp-web-app'
+    end
+
+    # general check
+    vm_config.vm.provision "shell", name: "hostname check", inline: "hostname"
+
+    # virtualbox tuning
+    vm_config.vm.provider "virtualbox" do |v|
+      v.gui  = false
+      
+      v.cpus   = uplift.get_vm_cpus(vm_client, 4)
+      v.memory = uplift.get_vm_memory(vm_client, 6 * 1024)
+
+      v.customize ['modifyvm', :id, '--cpuexecutioncap', '100'] 
+      v.customize ["modifyvm", :id, "--ioapic", "on"]
+
+      v.linked_clone = linked_clone
+    end
+
+  end  
+
+end

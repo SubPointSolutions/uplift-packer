@@ -1,10 +1,40 @@
 ﻿# fail on errors and include uplift helpers
 $ErrorActionPreference = "Stop"
 
-Import-Module Uplift.Core
+function Confirm-UpliftExitCode {
+    Param(
+        [Parameter(Mandatory=$True)]
+        $code,
 
-Write-UpliftMessage "Installing 7z and PowerShell software..."
-Write-UpliftEnv
+        [Parameter(Mandatory=$True)]
+        $message,
+
+        [Parameter(Mandatory=$False)]
+        $allowedCodes = @( 0 )
+    )
+
+    $valid = $false
+
+    Write-Host "Checking exit code: $code with allowed values: $allowedCodes"
+
+    foreach ($allowedCode in $allowedCodes) {
+        if($code -eq $allowedCode) {
+            $valid = $true
+            break
+        }
+    }
+
+    if( $valid -eq $false) {
+        $error_message =  "[!] $message - exit code is: $code but allowed values were: $allowedCodes"
+
+        Write-Host $error_message
+        throw $error_message
+    } else {
+        Write-Host "[+] exit code is: $code within allowed values: $allowedCodes"
+    }
+}
+
+Write-Host "Installing 7z and PowerShell software..."
 
 function Set-UpliftChocolateyBootstrap() {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingInvokeExpression", "", Scope="Function")]
@@ -15,19 +45,19 @@ function Set-UpliftChocolateyBootstrap() {
 
     )
 
-    Write-UpliftMessage "Set-ExecutionPolicy Bypass -Force"
+    Write-Host "Set-ExecutionPolicy Bypass -Force"
     Set-ExecutionPolicy Bypass -Force;
 
-    Write-UpliftMessage "Installing chocolatey..."
+    Write-Host "Installing chocolatey..."
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'));
     Confirm-UpliftExitCode $LASTEXITCODE "Cannot install chocolatey"
 
-    Write-UpliftMessage "choco install -y 7zip..."
+    Write-Host "choco install -y 7zip..."
     choco install -y 7zip --limit-output --acceptlicense --no-progress;
     Confirm-UpliftExitCode $LASTEXITCODE "Cannot install 7zip"
 
     if($psversiontable.PSVersion.Major -ne 5) {
-        Write-UpliftMessage "Major version of PowerShell below 5. Installing PowerShell, and a reboot is required"
+        Write-Host "Major version of PowerShell below 5. Installing PowerShell, and a reboot is required"
         choco install -y powershell --limit-output --acceptlicense --no-progress;
         Confirm-UpliftExitCode $LASTEXITCODE "Cannot install powershell" @(0, 3010)
 

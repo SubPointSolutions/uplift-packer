@@ -1,0 +1,19 @@
+{
+    "variables": {
+        "uplf_input_box_name": "uplift-local/win-2012r2-datacenter-soe",
+
+        "uplf_sp_product_key": "NQTMW-K63MQ-39G6H-B2CH9-FRDWJ",
+
+        "uplf_sp_resource_name": "ms-sharepoint2013-rtm",
+        "uplf_sp_update_resource_names": "",
+
+        "uplf_sp_lang_pack_resource_names": "ms-sharepoint2013-lang-pack-ar-sa,ms-sharepoint2013-lang-pack-cs-cz,ms-sharepoint2013-lang-pack-da-dk,ms-sharepoint2013-lang-pack-de-de,ms-sharepoint2013-lang-pack-fr-fr,ms-sharepoint2013-lang-pack-fi-fi,ms-sharepoint2013-lang-pack-nl-nl,ms-sharepoint2013-lang-pack-he-il,ms-sharepoint2013-lang-pack-hi-in,ms-sharepoint2013-lang-pack-kk-kz,ms-sharepoint2013-lang-pack-it-it,ms-sharepoint2013-lang-pack-lv-lv,ms-sharepoint2013-lang-pack-pl-pl,ms-sharepoint2013-lang-pack-ru-ru,ms-sharepoint2013-lang-pack-ro-ro,ms-sharepoint2013-lang-pack-es-es,ms-sharepoint2013-lang-pack-sv-se,ms-sharepoint2013-lang-pack-uk-ua",
+
+        "uplf_sp_img_config_script_name": "_sp2013_image_config.dsc.ps1",
+        "uplf_sp_img_packages_script_name": "_sp2013_image_packages.dsc.ps1",
+
+        "uplf_sp_prerequisite_script_name": "_sp2013_pre_rtm.dsc.ps1",
+        "uplf_sp_bin_script_name": "_sp2013_bin.dsc.ps1",
+        "uplf_sp_lang_pack_script_name": "_sp2013_lang_pack.dsc.ps1"
+    }
+}

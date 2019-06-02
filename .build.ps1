@@ -119,7 +119,10 @@ param(
 
     # box export options
     $UPLF_EXPORT_BOX_PREFIX = 'uplift-local',
-    $UPLF_EXPORT_BOX_PATH   = 'build-export-boxes'
+    $UPLF_EXPORT_BOX_PATH   = 'build-export-boxes',
+
+    # don't destory test infrastructure
+    $UPLF_TEST_NO_DESTROY   = $null
 )
 
 $dirPath = $BuildRoot
@@ -416,8 +419,14 @@ task VagrantBoxTest {
             throw "Failed vagrant testing: $_"
         }
         finally {
-            Write-BuildInfoMessage "Running: final vagrant clean up script"
-            pwsh -c "cd $vagrantCwd; . ./.vagrant-cleanup.ps1"
+
+            if($null -eq $UPLF_TEST_NO_DESTROY) {
+                Write-BuildInfoMessage "Running: final vagrant clean up script"
+                pwsh -c "cd $vagrantCwd; . ./.vagrant-cleanup.ps1"
+            } 
+            else {
+                Write-BuildInfoMessage "Running: leaving test infrastruture (UPLF_TEST_NO_DESTROY != null)"
+            }
         }
     #}
 }
