@@ -80,7 +80,7 @@ function Invoke-UnpackLanguagePack($src, $dst) {
     }
 
     # output, just in case
-    dir $dst
+    # dir $dst
 }
 
 foreach($langPackResourceName in $langPackResourceNames) {

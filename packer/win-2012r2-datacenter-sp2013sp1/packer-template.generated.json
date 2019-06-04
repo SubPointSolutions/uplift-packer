@@ -29,6 +29,7 @@
     "uplf_sp_prerequisite_script_name": "_sp2013_pre_rtm.dsc.ps1",
     "uplf_sp_bin_script_name": "_sp2013_bin.dsc.ps1",
     "uplf_sp_lang_pack_script_name": "_sp2013_lang_pack.dsc.ps1",
+    "uplf_sp_show_components_script_name": "_sp2013_show_components.dsc.ps1",
     "uplf_sp_product_key": "NQTMW-K63MQ-39G6H-B2CH9-FRDWJ"
   },
   "builders": [
