@@ -1,5 +1,16 @@
 {
     "variables": {
-        "uplf_sp_update_resource_names": "ms-sharepoint2013-update-2014.04.17-kb2880552"
+        "uplf_sp_update_resource_names": "ms-sharepoint2013-update-2014.04.17-kb2880552",
+
+        "uplf_sp_img_config_script_name": "_sp2013_image_config.dsc.ps1",
+        "uplf_sp_img_packages_script_name": "_sp2013_image_packages.dsc.ps1",
+
+        "uplf_sp_img_features_script_name": "_sp2013_features_rtm.dsc.ps1",
+        "uplf_sp_prerequisite_script_name": "_sp2013_pre_rtm.dsc.ps1",
+        
+        "uplf_sp_bin_script_name": "_sp2013_bin.dsc.ps1",
+        "uplf_sp_lang_pack_script_name": "_sp2013_lang_pack.dsc.ps1",
+
+        "uplf_sp_product_key": "NQTMW-K63MQ-39G6H-B2CH9-FRDWJ"
     }
 }

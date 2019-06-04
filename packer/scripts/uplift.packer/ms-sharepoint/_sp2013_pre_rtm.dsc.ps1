@@ -10,6 +10,9 @@ $installDir = $ENV:UPLF_INSTALL_DIR
 $preReqDir  = $ENV:UPLF_PREREQ_DIR
 $offline    = $ENV:UPLF_PREREQ_OFFLINE
 
+# RTM never gives correct output for DSC check
+$env:UPLF_DSC_CHECK = $null
+
 Write-UpliftMessage "Using [ENV:UPLF_PREREQ_OFFLINE]: $offline"
 
 if($null -eq $installDir) {

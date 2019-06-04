@@ -63,9 +63,7 @@ function Save-JSON {
         $validate = $true
     )
 
-    Write-Host "Packer version:"
-    packer version
-
+    Write-Host "Packer version: $(packer version)"
     Write-Host "Saving template: $file"
 
     # none of these must be null
@@ -107,8 +105,7 @@ function Confirm-Packer {
         $file
     )
 
-    Write-Host "Packer version:"
-    packer version
+    Write-Host "Packer version: $(packer version)"
 
     Write-Host "Validating template: packer validate $file"
     packer validate $file

@@ -8,6 +8,9 @@
     "uplf_vboxmanage_cpuexecutioncap": "100",
     "uplf_vboxmanage_cpus": "4",
     "uplf_vboxmanage_memory": "2048",
+    "uplf_hyperv_cpus": "4",
+    "uplf_hyperv_memory": "2048",
+    "uplf_hyperv_switch_name": "Default Switch",
     "uplf_git_branch": "",
     "uplf_git_commit": "",
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
@@ -20,10 +23,12 @@
     "uplf_sp_product_key": "NQGJR-63HC8-XCRQH-MYVCH-3J3QR",
     "uplf_sp_resource_name": "ms-sharepoint2016-rtm",
     "uplf_sp_lang_pack_resource_names": "ms-sharepoint2016-lang-pack-ar-sa,ms-sharepoint2016-lang-pack-cs-cz,ms-sharepoint2016-lang-pack-da-dk,ms-sharepoint2016-lang-pack-de-de,ms-sharepoint2016-lang-pack-fr-fr,ms-sharepoint2016-lang-pack-fi-fi,ms-sharepoint2016-lang-pack-nl-nl,ms-sharepoint2016-lang-pack-he-il,ms-sharepoint2016-lang-pack-hi-in,ms-sharepoint2016-lang-pack-kk-kz,ms-sharepoint2016-lang-pack-it-it,ms-sharepoint2016-lang-pack-lv-lv,ms-sharepoint2016-lang-pack-pl-pl,ms-sharepoint2016-lang-pack-ru-ru,ms-sharepoint2016-lang-pack-ro-ro,ms-sharepoint2016-lang-pack-es-es,ms-sharepoint2016-lang-pack-sv-se,ms-sharepoint2016-lang-pack-uk-ua",
+    "uplf_sp_img_features_script_name": "_sp2013_features.dsc.ps1",
     "uplf_sp_img_config_script_name": "_sp2013_image_config.dsc.ps1",
     "uplf_sp_img_packages_script_name": "_sp2013_image_packages.dsc.ps1",
     "uplf_sp_prerequisite_script_name": "_sp2013_pre_rtm.dsc.ps1",
     "uplf_sp_bin_script_name": "_sp2013_bin.dsc.ps1",
+    "uplf_sp_show_components_script_name": "_sp2013_show_components.dsc.ps1",
     "uplf_sp_lang_pack_script_name": "_sp2013_lang_pack.dsc.ps1",
     "uplf_sp_update_resource_names": "ms-sharepoint2016-fp2"
   },
@@ -121,6 +126,16 @@
     {
       "type": "powershell",
       "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_img_features_script_name`}}"
+      ],
+      "environment_vars": []
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_prerequisite_script_name`}}"
       ],
       "environment_vars": [
@@ -205,6 +220,12 @@
         "UPLF_SP_LANG_PACK_RESOURCE_NAMES={{user `uplf_sp_lang_pack_resource_names`}}",
         "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
         "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_show_components_script_name`}}"
       ]
     },
     {

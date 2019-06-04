@@ -40,6 +40,22 @@
             ]
         },
 
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_img_features_script_name`}}"
+            ],
+            "environment_vars": [
+                
+            ]
+        },
+
+        {
+            "type": "windows-restart"
+        },
+
+
         {
             "type": "powershell",
             "scripts": [
@@ -133,6 +149,13 @@
                 "UPLF_SP_LANG_PACK_RESOURCE_NAMES={{user `uplf_sp_lang_pack_resource_names`}}",
                 "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
                 "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+            ]
+        },
+
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_show_components_script_name`}}"
             ]
         },
 

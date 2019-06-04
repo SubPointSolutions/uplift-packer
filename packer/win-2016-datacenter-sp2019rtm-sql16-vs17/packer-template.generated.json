@@ -3,6 +3,9 @@
     "uplf_http_directory": "",
     "uplf_scripts_path": "./../",
     "uplf_local_repository_path": "c:/_uplift_resources",
+    "uplf_hyperv_cpus": "4",
+    "uplf_hyperv_memory": "2048",
+    "uplf_hyperv_switch_name": "Default Switch",
     "uplf_git_branch": "",
     "uplf_git_commit": "",
     "uplf_box_spec_file": "c:/_uplift_metadata/box-spec.json",
@@ -16,8 +19,10 @@
     "uplf_disk_size": "100000",
     "uplf_uplift_core_module_version": "",
     "uplf_invokeuplift_module_repository": "",
+    "uplf_sp_img_features_script_name": "_sp2013_features.dsc.ps1",
     "uplf_sp_img_config_script_name": "_sp2013_image_config.dsc.ps1",
     "uplf_sp_img_packages_script_name": "_sp2013_image_packages.dsc.ps1",
+    "uplf_sp_show_components_script_name": "_sp2013_show_components.dsc.ps1",
     "uplf_sp_lang_pack_script_name": "_sp2013_lang_pack.dsc.ps1",
     "uplf_sp_product_key": "M692G-8N2JP-GG8B2-2W2P7-YY7J6",
     "uplf_sp_resource_name": "ms-sharepoint2019-rtm",
@@ -295,6 +300,16 @@
     {
       "type": "powershell",
       "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_img_features_script_name`}}"
+      ],
+      "environment_vars": []
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_prerequisite_script_name`}}"
       ],
       "environment_vars": [
@@ -379,6 +394,12 @@
         "UPLF_SP_LANG_PACK_RESOURCE_NAMES={{user `uplf_sp_lang_pack_resource_names`}}",
         "UPLF_HTTP_ADDR={{user `uplf_bin_repo_http_addr`}}",
         "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_show_components_script_name`}}"
       ]
     },
     {

@@ -48,8 +48,28 @@ Write-UpliftMessage " - local repo     : $uplifLocalRepository"
 
 function Invoke-UnpackLanguagePack($src, $dst) {
 
+    # sp2016 serverlanguagepack.exe
+    $exePath = $src + "/serverlanguagepack.exe"
+    $isoPath = $src + "/serverlanguagepack.img"
+    
     Remove-Item $dst -Force -Recurse -ErrorAction SilentlyContinue
-    . $src /extract:$dst /quiet
+
+    if( (test-Path $exePath) -eq $True) {
+        Write-UpliftMessage " - unpacking exe: $exePath"
+        . $exePath /extract:$dst /quiet
+    }
+
+    if( (test-Path $isoPath) -eq $True) {
+        Write-UpliftMessage " - unpacking iso: $isoPath"
+        
+        if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) {throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
+        set-alias sz "$env:ProgramFiles\7-Zip\7z.exe"
+
+        Write-UpliftMessage " - cmd:  sz x -y $localFilePath -o$dst"
+
+        sz x -y "$isoPath" "-o$dst"
+        Confirm-UpliftExitCode $LASTEXITCODE "Failed to unpack: $localFilePath"
+    }   
 }
 
 foreach($langPackResourceName in $langPackResourceNames) {
@@ -57,7 +77,7 @@ foreach($langPackResourceName in $langPackResourceNames) {
     Confirm-UpliftExitCode $LASTEXITCODE "Cannot download resource: $langPackResourceName"
 
     Invoke-UnpackLanguagePack `
-        "$uplifLocalRepository/$langPackResourceName/latest/serverlanguagepack.exe" `
+        "$uplifLocalRepository/$langPackResourceName/latest/" `
         "$uplifLocalRepository/$langPackResourceName/$langPackResourceName"
 
     $langPackFolders += "$uplifLocalRepository/$langPackResourceName/$langPackResourceName"
