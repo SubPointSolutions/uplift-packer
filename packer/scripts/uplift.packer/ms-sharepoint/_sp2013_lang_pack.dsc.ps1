@@ -55,11 +55,12 @@ function Invoke-UnpackLanguagePack($src, $dst) {
     Remove-Item $dst -Force -Recurse -ErrorAction SilentlyContinue
 
     if( (test-Path $exePath) -eq $True) {
+        # sharepoint 2016
         Write-UpliftMessage " - unpacking exe: $exePath"
         . $exePath /extract:$dst /quiet
-    }
 
-    if( (test-Path $isoPath) -eq $True) {
+    } elseif( (test-Path $isoPath) -eq $True) {
+        # sharepoint 2013
         Write-UpliftMessage " - unpacking iso: $isoPath"
         
         if (-not (test-path "$env:ProgramFiles\7-Zip\7z.exe")) {throw "$env:ProgramFiles\7-Zip\7z.exe needed"}
@@ -69,11 +70,25 @@ function Invoke-UnpackLanguagePack($src, $dst) {
 
         sz x -y "$isoPath" "-o$dst"
         Confirm-UpliftExitCode $LASTEXITCODE "Failed to unpack: $localFilePath"
-    }   
+
+    }  else {
+        # sharepoint v-next? 
+        $errMessage = "Cannot detect serverlanguagepack.exe or serverlanguagepack.img in folder: $src"
+
+        Write-UpliftErrorMessage $errMessage
+        throw $errMessage
+    }
+
+    # output, just in case
+    dir $dst
 }
 
 foreach($langPackResourceName in $langPackResourceNames) {
-    pwsh -c "Invoke-Uplift resource download-local $langPackResourceName -server $upliftHttpServer -repository $uplifLocalRepository -debug"
+    
+    # don't unpack .iso/.img (-skip-unpack)
+    # we have Invoke-UnpackLanguagePack for this case
+
+    pwsh -c "Invoke-Uplift resource download-local $langPackResourceName -server $upliftHttpServer -repository $uplifLocalRepository -debug -skip-unpack"
     Confirm-UpliftExitCode $LASTEXITCODE "Cannot download resource: $langPackResourceName"
 
     Invoke-UnpackLanguagePack `

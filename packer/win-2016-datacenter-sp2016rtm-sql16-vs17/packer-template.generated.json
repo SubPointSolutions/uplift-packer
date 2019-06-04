@@ -317,15 +317,6 @@
     {
       "type": "powershell",
       "scripts": [
-        "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sharepoint/{{user `uplf_sp_prerequisite_script_name`}}"
-      ],
-      "environment_vars": [
-        "UPLF_INSTALL_DIR={{user `uplf_local_repository_path` }}/{{user `uplf_sp_resource_name`}}/latest"
-      ]
-    },
-    {
-      "type": "powershell",
-      "scripts": [
         "{{user `uplf_scripts_path` }}/scripts/uplift.packer/common/invoke-dist-helper.ps1"
       ],
       "environment_vars": [
