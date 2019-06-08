@@ -40,6 +40,16 @@
                 "UPLF_LOCAL_REPOSITORY_PATH={{user `uplf_local_repository_path`}}"
             ]
         },
+        
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{user `uplf_scripts_path` }}/scripts/uplift.packer/ms-sql-server/sql16-prerequisites.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart"
+        },
 
         {
             "type": "powershell",
