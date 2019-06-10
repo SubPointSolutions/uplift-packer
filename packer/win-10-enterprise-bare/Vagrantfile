@@ -1,0 +1,36 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+box_name       =  ENV['UPLF_VAGRANT_BOX_NAME']       || "uplift-local/win-10-enterprise-bare-master" 
+linked_clone   =  ENV['UPLF_VAGRANT_LINKED_CLONE'].to_s.empty? == false
+machine_folder =  ENV['UPLF_VBMANAGE_MACHINEFOLDER'] || nil
+
+puts "Using box_name: #{box_name}"
+
+vm_name_empty  = "client"
+puts "using box: #{box_name}"
+
+# testing strategy:
+# create box, see if default provision even works with all default settings
+# box should be able to load up without additional WinRM config
+
+Vagrant.configure("2") do |config|
+  
+  config.vm.define(vm_name_empty) do | vm_config |   
+    
+    vm_config.vm.box = box_name
+    vm_config.vm.box_check_update = false
+
+    vm_config.vm.provision "shell", name: "hostname check", inline: "hostname"
+
+    vm_config.vm.provider "virtualbox" do |v|
+      v.gui  = false
+      
+      v.cpus    = 4
+      v.memory  = 1024
+
+      v.linked_clone = linked_clone
+    end
+  end
+
+end

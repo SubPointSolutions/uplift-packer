@@ -1,0 +1,17 @@
+{
+    "variables": {
+        "uplf_iso_url": "https://software-download.microsoft.com/download/sg/17763.107.101029-1455.rs5_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+        "uplf_iso_checksum": "0278FC4638741F4A1DC85C39ED7FA76BB15FD582165F6EF036E9A9FB2F029351",
+        "uplf_iso_checksum_type": "sha256",
+
+        "uplf_disk_size": "80000",
+
+        "uplf_vboxmanage_memory": "4096",
+        "uplf_vboxmanage_cpus": "4",
+
+        "uplf_output_directory": "packer_builds/win-10-enterprise-bare",
+        "uplf_vagrant_box_output": "packer_boxes/win-10-enterprise-bare/win-10-enterprise-bare.box",
+
+        "uplf_compression_level" : "0"
+    }
+}

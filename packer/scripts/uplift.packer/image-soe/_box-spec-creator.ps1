@@ -45,11 +45,19 @@ $obj | Add-Member -Name "Get_PSRepository" `
     -Value ( Get-PSRepository  ) `
     -Force
 
-Write-UpliftMessage "Creating Get-WindowsFeature info..."
-$obj | Add-Member -Name "Get_WindowsFeature" `
-    -Type NoteProperty `
-    -Value ( Get-WindowsFeature  ) `
-    -Force
+try {
+    # won't work on win10
+    # simply try/catch
+
+    Write-UpliftMessage "Creating Get-WindowsFeature info..."
+    $obj | Add-Member -Name "Get_WindowsFeature" `
+        -Type NoteProperty `
+        -Value ( Get-WindowsFeature  ) `
+        -Force
+        
+} catch {
+
+}
 
 Write-UpliftMessage "Creating Win32_LogicalDisk info..."
 $obj | Add-Member -Name "Win32_LogicalDisk" `

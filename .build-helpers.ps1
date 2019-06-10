@@ -516,6 +516,7 @@ function New-PackerBuildContainer {
     Write-BuildInfoMessage "Creating build container for image: $imageName" 
 
     $port = $httpServerSession.HttpPort
+    $httpServerJob = $httpServerSession.HttpServerJob
 
     $packerFileName = Get-PackerImageFile $imageName
     $packerTemplate = Get-Content $packerFileName -Raw
@@ -655,17 +656,34 @@ function Invoke-PackerBuild($force = $false) {
 
             $packerOnlyValue = $script:PACKER_ONLY
 
-            if($force -eq $True) {
-                packer build `
-                    -force `
-                    -only $packerOnlyValue `
-                    -var-file="$($container.VariablesFile)" `
-                    "$($container.PackerFile)"
+            if($null -eq $PACKER_DEBUG) {
+                if($force -eq $True) {
+                    packer build `
+                        -force `
+                        -only $packerOnlyValue `
+                        -var-file="$($container.VariablesFile)" `
+                        "$($container.PackerFile)"
+                } else {
+                    packer build `
+                        -only $packerOnlyValue `
+                        -var-file="$($container.VariablesFile)" `
+                        "$($container.PackerFile)"
+                }
             } else {
-                packer build `
-                    -only $packerOnlyValue `
-                    -var-file="$($container.VariablesFile)" `
-                    "$($container.PackerFile)"
+                if($force -eq $True) {
+                    packer build `
+                        -force `
+                        -only $packerOnlyValue `
+                        -var-file="$($container.VariablesFile)" `
+                        -debug `
+                        "$($container.PackerFile)" 
+                } else {
+                    packer build `
+                        -only $packerOnlyValue `
+                        -var-file="$($container.VariablesFile)" `
+                        -debug `
+                        "$($container.PackerFile)"
+                }
             }
 
             Confirm-ExitCode $LASTEXITCODE "Failed: packer build"

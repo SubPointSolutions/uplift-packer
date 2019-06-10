@@ -109,6 +109,8 @@ param(
     $PACKER_PLUGIN_MAX_PORT = $null,
     $PACKER_PLUGIN_MIN_PORT = $null,
 
+    $PACKER_DEBUG = $null,
+
     $PACKER_ONLY= "virtualbox-iso",
 
     # QA params
@@ -179,6 +181,8 @@ Enter-Build {
 
     $httpServerSession = New-UpliftHttpServerSession $packerImageName
     $container = New-PackerBuildContainer $packerImageName $httpServerSession
+
+    $script:container = $container
 
     New-UpliftTrackEvent "packer.build.start" `
         (Get-AppInsightProperties $container) `
@@ -276,6 +280,22 @@ Exit-Build {
                 (Get-AppInsightProperties $container) `
                 (Get-AppInsightMetrics $container)
         }
+    }
+
+    try {
+        if($null -ne $script:container) {
+            $cnt = $script:container
+
+            if($null -ne $cnt.LocalHttpServerJobId) {
+                Remove-Job $cnt.LocalHttpServerJobId -Force -ErrorAction SilentlyContinue
+            } else {
+                Write-BuildWarningMessage "[!]`t LocalHttpServerJobId is null"
+            }
+        } else {
+            Write-BuildWarningMessage "[!]`t container is null"
+        }
+    } catch {
+
     }
 }
 
